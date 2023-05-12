@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %} My profile {% endblock %}
+
+{% block link %}
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/my_profile.css') }}">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-color: #f1f1f1;
+    }
+</style>
+
+<h1>Профіль</h1>
+
+
+<div class="container">
+    <div class="row profile">
+		<div class="col-md-3">
+			<div class="profile-sidebar">
+				<div class="profile-userpic">
+					<img src="{{ url_for('static', filename=account.img_avatar) }}" class="img-responsive" alt="">
+				 </div>
+				 
+				<div class="profile-usertitle">
+					<div class="profile-usertitle-name">
+						{{ account.login }}
+					</div>
+
+					<div class="profile-usertitle-name">
+						{{ account.email }}
+					</div>
+				</div>
+				
+			
+				<div class="profile-usermenu">
+					<ul class="nav">
+						<li class="active">
+							<a href="#">
+							<i class="glyphicon glyphicon-home"></i>
+							Головна сторінка</a>
+						</li>
+						<li>
+							<a href="#">
+							<i class="glyphicon glyphicon-user"></i>
+							Налаштування акаунта </a>
+						</li>
+						<li>
+							<a href="/" target="_blank">
+							<i class="glyphicon glyphicon-ok"></i>
+							Збережені пости </a>
+						</li>
+						<li>
+							<a href="/" target="_blank">
+							<i class="glyphicon glyphicon-ok"></i>
+							Вподобані пости </a>
+						</li>
+						<li>
+							<a href="/" target="_blank">
+							<i class="glyphicon glyphicon-ok"></i>
+							Список коментарів </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-9">
+            <div class="profile-content">
+                <h1>Останій перегляд постів</h1>
+			  
+            </div>
+		</div>
+	</div>
+</div>
+<br>
+<br>
+
+
+
+{% endblock %}
