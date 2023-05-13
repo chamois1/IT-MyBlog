@@ -1,17 +1,24 @@
 import os
 import uuid
-from flask import Flask, render_template, request as flask_request, redirect, flash, session, url_for
-from flask_session import Session
-from flask_bcrypt import Bcrypt, check_password_hash
-
-from db import db_init, db  
-from models import Posts, Accounts_Users
-
 from functools import wraps
 
-# config
-app = Flask(__name__)
+from flask import Flask, render_template, request, redirect, flash, session, url_for
+from flask_session import Session
+from flask_bcrypt import Bcrypt, check_password_hash
+from flask_ckeditor import CKEditor
 
+from db import db_init, db  
+from models import Accounts_Users, Posts
+from admin_panel import admin_bp
+
+# settings
+app = Flask(__name__)
+ckeditor = CKEditor(app)
+
+# urls from file admin_panel
+app.register_blueprint(admin_bp)
+
+# config
 app.config['SECRET_KEY'] = '(#U(@FU*AUF*UIAJ091E)!(@#$*190()$!2497() FUIAJQIJ*($@#!*7EDSAIJIDJAS)))'
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///blog.sqlite3"
@@ -21,14 +28,15 @@ app.config['UPLOAD_FOLDER'] = 'static/images/'
 db_init(app)
 Session(app)
 
+
 # decorator, checking session on user, whether the user is logged into the account
 def session_required(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_if_session(*args, **kwargs):
         if 'id' not in session:
             return redirect(url_for('sign_in'))
         return f(*args, **kwargs)
-    return decorated_function
+    return decorated_if_session
 
 
 # Main page
@@ -40,12 +48,12 @@ def index():
 # Sign up
 @app.route('/sign-up', methods=['POST', 'GET'])
 def sign_up():
-    if flask_request.method == "POST":
+    if request.method == "POST":
        # form       
-       login = flask_request.form["login"]
-       email = flask_request.form["email"]
-       avatar = flask_request.files['avatar']
-       password = flask_request.form["password"].encode('utf-8') 
+       login = request.form["login"]
+       email = request.form["email"]
+       avatar = request.files['avatar']
+       password = request.form["password"].encode('utf-8') 
 
 
        # checking existing account
@@ -60,14 +68,14 @@ def sign_up():
             if avatar:
                 # Generate a unique image using UUID and save the avatar
                 img = str(uuid.uuid4()) + os.path.splitext(avatar.filename)[1]
-                avatar.save(os.path.join(app.config['UPLOAD_FOLDER'] + 'avatars/', img))
-                avatar_path = os.path.join(app.config['UPLOAD_FOLDER'] + 'avatars/', img)
+                avatar.save(os.path.join(app.config['UPLOAD_FOLDER'] + f'avatars/{img}'))
+                avatar_path = os.path.join(app.config['UPLOAD_FOLDER'] + f'avatars/{img}')
             else: 
-                avatar_path = app.config['UPLOAD_FOLDER'] + 'avatars/default_avatars.jpg'
+                avatar_path = app.config['UPLOAD_FOLDER'] + '/avatars/default_avatar.jpg'
 
 
             # save
-            save_data = Accounts_Users(img_avatar=avatar_path if avatar_path else None, login=login, email=email, password=password_hash)
+            save_data = Accounts_Users(img_avatar=avatar_path, login=login, email=email, password=password_hash)
             db.session.add(save_data)
             db.session.commit()
                 
@@ -84,10 +92,10 @@ def sign_up():
 # Sign in 
 @app.route('/sign-in', methods=['POST', 'GET'])
 def sign_in():    
-    if flask_request.method == "POST":
+    if request.method == "POST":
        # form       
-       email = flask_request.form["email"]
-       password = flask_request.form["password"].encode('utf-8') 
+       email = request.form["email"]
+       password = request.form["password"].encode('utf-8') 
 
     
        search_account = db.session.query(Accounts_Users).filter_by(email=email).first()
@@ -98,6 +106,7 @@ def sign_in():
        if check_password_hash(search_account.password, password):
            # save session
            session['id'] = search_account.id
+           session['is_admin'] = search_account.is_admin
            return redirect('/my-profile')
        
        else:
@@ -107,20 +116,27 @@ def sign_in():
     return render_template('sign_in.html')
 
 
-@app.route('/my-profile')
+@app.route('/my-profile', methods=['POST', 'GET'])
 @session_required
 def my_profile():
     session_id = session.get('id')
+    session_is_admin = session.get('is_admin')
     account = db.session.query(Accounts_Users).filter_by(id=session_id).first()
 
+
+    # button
+    if 'logout' in request.form:
+        session.clear()
+        return redirect('sign-in')
+
+
     context = {
-        'account': account
+        'account': account,
+        'session_is_admin': session_is_admin
     }
 
 
     return render_template('my_profile.html', **context)
-
-
 
 
 

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %} Добавити пост {% endblock %}
+
+{% block link %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+{% endblock %}
+
+
+{% block body %} 
+{% include 'admin_panel.html' %}
+
+
+<div class="side-body">
+    <h1>Новий пост</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-body">
+        
+                    <div class="row">
+                        <div class="col-md-8">
+                       
+                            <div class="form-group row">
+                                <label for="text" class="col-12 col-form-label">Заголовок поста</label> 
+                                <div class="col-12">
+                                <input id="text" name="title" placeholder="Ведіть заголовок" class="form-control here" type="text" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="textarea" class="col-12 col-form-label">Опис поста</label> 
+                                <div class="col-12">
+                                    {{ ckeditor.create(name="description")}}
+                                </div>
+                            </div> 
+                            
+                        </div>
+                        <div class="col-md-4 ">
+                            
+                            <div class="card mb-3" style="max-width: 18rem;">
+                                <div class="card-header bg-light">Теги</div>
+                                <div class="card-body">
+                                
+                                    <div class="form-group row">
+                                        <div class="col-9">
+                                        <input id="tags" name="tags" placeholder="Теги" class="form-control here" type="text" required>
+                                        </div>
+                                    </div> 
+
+                                </div>                                
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-9">
+                                    <input type="file" accept="image/" name="image-post" class="form-control here">
+                                </div>
+                            </div> 
+                            <button name="submit" type="submit" class="btn btn-primary">Зберегти</button>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    {{ ckeditor.load() }}
+    {{ ckeditor.config(name='description') }}
+</div>
+
+
+{% endblock %}

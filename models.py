@@ -1,5 +1,6 @@
+from datetime import datetime
 from db import db
-from sqlalchemy import Column, String, Integer, DateTime, Text
+from sqlalchemy import Column, String, Integer, DateTime, Text, Boolean
 
 
 # Columnt posts
@@ -7,15 +8,19 @@ class Posts(db.Model):
     __tablename__ = "posts"   
 
     id = Column("id", Integer, primary_key=True)
-    date = Column("date", DateTime)
-    title_posts = Column('title_posts', String)
-    description_posts = Column("description_posts", Text)
-    tag_posts = Column("tag_posts", String)
+    date = Column(DateTime, default=datetime.utcnow)
+    title = Column('title', String)
+    description = Column("description", Text)
+    tag = Column("tag", String)
+    image = Column("image", String, nullable=True, default='/images/posts/default_post.jpeg')
 
     
 # Column accounts for users
 class Accounts_Users(db.Model):
-    """Allow users to leave comments under posts"""
+    """
+       If user - Allow users to leave comments under posts
+       if admin - edit comments, create post, other
+    """
 
     __tablename__ = "accounts"   
 
@@ -23,4 +28,5 @@ class Accounts_Users(db.Model):
     login = Column('login', String(25), nullable=False)
     email = Column("emai", String(25), nullable=False)
     password = Column("password", String, nullable=False)
-    img_avatar = Column("avatar", String, nullable=True)
+    img_avatar = Column("avatar", String, nullable=True, default='/images/avatars/default_avatar.jpeg')
+    is_admin = Column(Boolean, default=False)
