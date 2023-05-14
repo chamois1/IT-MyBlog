@@ -4,10 +4,37 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %}</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     {% block link %}{% endblock %}
 </head>
 <body>
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <a href="/" class="navbar-brand">Головна сторінка</a>
+        
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <a href="/news" class="nav-item active nav-link">Новини</a>
+                <a href="/resources" class="nav-item active nav-link">Ресурси</a>
+                <a href="/contacts" class="nav-item active nav-link">Контакти</a>
+
+                {% if session_is_admin == True %}
+                    <a href="/admin" class="nav-item active nav-link">Адмін панель</a>
+                {% endif %}
+
+                {% if not id_session %}
+                    <a href="/sign-up" class="nav-item active nav-link">Зарегеструватися</a>
+                {% endif %}
+                
+            </ul>
+
+            <form action="#" method="post" class="form-inline my-2 mylg-0">
+                <input type="search" class="form-control mr-sm-2" placeholder="Що знайти?" aria-label="Buscar">
+                <button class="btn btn-outline-success" type="submit">Пошук</button>
+            </form>
+        </div>
+    </nav>
+
     {% block body %}{% endblock %}
 </body>
 </html>

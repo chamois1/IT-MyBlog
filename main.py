@@ -7,9 +7,14 @@ from flask_session import Session
 from flask_bcrypt import Bcrypt, check_password_hash
 from flask_ckeditor import CKEditor
 
-from db import db_init, db  
-from models import Accounts_Users, Posts
+from db import db_init, db
+from models import Accounts_Users
 from admin_panel import admin_bp
+from posts_routes import posts_bp
+
+"""
+This file for starting server, settings and users authorizations
+"""
 
 # settings
 app = Flask(__name__)
@@ -17,6 +22,7 @@ ckeditor = CKEditor(app)
 
 # urls from file admin_panel
 app.register_blueprint(admin_bp)
+app.register_blueprint(posts_bp)
 
 # config
 app.config['SECRET_KEY'] = '(#U(@FU*AUF*UIAJ091E)!(@#$*190()$!2497() FUIAJQIJ*($@#!*7EDSAIJIDJAS)))'
@@ -28,7 +34,6 @@ app.config['UPLOAD_FOLDER'] = 'static/images/'
 db_init(app)
 Session(app)
 
-
 # decorator, checking session on user, whether the user is logged into the account
 def session_required(f):
     @wraps(f)
@@ -37,6 +42,14 @@ def session_required(f):
             return redirect(url_for('sign_in'))
         return f(*args, **kwargs)
     return decorated_if_session
+
+
+# function will pass variables for all html
+@app.context_processor
+def session_base():
+    session_is_admin = session.get('is_admin')
+    id_session = session.get('id')
+    return dict(session_is_admin=session_is_admin, id_session=id_session)
 
 
 # Main page
@@ -119,25 +132,15 @@ def sign_in():
 @app.route('/my-profile', methods=['POST', 'GET'])
 @session_required
 def my_profile():
-    session_id = session.get('id')
-    session_is_admin = session.get('is_admin')
-    account = db.session.query(Accounts_Users).filter_by(id=session_id).first()
-
+    id_session = session.get('id')
+    account = db.session.query(Accounts_Users).filter_by(id=id_session).first()
 
     # button
     if 'logout' in request.form:
         session.clear()
         return redirect('sign-in')
 
-
-    context = {
-        'account': account,
-        'session_is_admin': session_is_admin
-    }
-
-
-    return render_template('my_profile.html', **context)
-
+    return render_template('my_profile.html', account=account)
 
 
 if __name__ == '__main__':

@@ -3,18 +3,6 @@ from db import db
 from sqlalchemy import Column, String, Integer, DateTime, Text, Boolean
 
 
-# Columnt posts
-class Posts(db.Model):
-    __tablename__ = "posts"   
-
-    id = Column("id", Integer, primary_key=True)
-    date = Column(DateTime, default=datetime.utcnow)
-    title = Column('title', String)
-    description = Column("description", Text)
-    tag = Column("tag", String)
-    image = Column("image", String, nullable=True, default='/images/posts/default_post.jpeg')
-
-    
 # Column accounts for users
 class Accounts_Users(db.Model):
     """
@@ -30,3 +18,27 @@ class Accounts_Users(db.Model):
     password = Column("password", String, nullable=False)
     img_avatar = Column("avatar", String, nullable=True, default='/images/avatars/default_avatar.jpeg')
     is_admin = Column(Boolean, default=False)
+
+
+# Posts
+class Posts(db.Model):
+    __tablename__ = "posts"   
+
+    id = Column("id", Integer, primary_key=True)
+    date = Column(DateTime, default=datetime.utcnow)
+    title = Column('title', String)
+    description = Column("description", Text)
+    tag = Column("tag", String)
+    image = Column("image", String, nullable=True, default='/images/posts/default_post.jpeg')
+    type = Column('type', String)
+
+
+# Comments for post
+class Comments(db.Model):
+    __tablename__ = "comments"
+
+    id = Column("id", Integer, primary_key=True)
+    date = Column(DateTime, default=datetime.utcnow)
+    text = Column('text', Text)
+    id_post = Column('id_post', Integer)
+    id_author = Column('id_author', Integer)

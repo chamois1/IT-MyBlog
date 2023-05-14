@@ -3,14 +3,42 @@
 {% block title %} Добавити пост {% endblock %}
 
 {% block link %}
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/admin_panel.css') }}">
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 {% endblock %}
 
-
 {% block body %} 
-{% include 'admin_panel.html' %}
+<!-- Nav bar left -->
+<div class="row">
+    <!-- Menu -->
+    <div class="side-menu">    
+    <nav class="navbar navbar-default" role="navigation">
+
+    <div class="navbar-header">
+        <div class="brand-wrapper">
+            <div class="brand-name-wrapper">
+                <a class="navbar-brand" href="#">
+                    Адмін панель
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Menu -->  
+    <div class="side-menu-container">
+        <ul class="nav navbar-nav">
+            <li><a href="/admin/add-post"><span class="glyphicon glyphicon-send"></span>Добавити пост</a></li>
+            <li class="active"><a href="#"><span class="glyphicon glyphicon-pencil"></span>Редагувати пости</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-user"></span>Користувачі</a></li>
+        </ul>
+    </div>
+</nav>
+    </div>
+</div>
 
 
+<!-- Create post -->
 <div class="side-body">
     <h1>Новий пост</h1>
 
@@ -29,6 +57,7 @@
                                 </div>
                             </div>
 
+
                             <div class="form-group row">
                                 <label for="textarea" class="col-12 col-form-label">Опис поста</label> 
                                 <div class="col-12">
@@ -42,13 +71,25 @@
                             <div class="card mb-3" style="max-width: 18rem;">
                                 <div class="card-header bg-light">Теги</div>
                                 <div class="card-body">
-                                
                                     <div class="form-group row">
                                         <div class="col-9">
                                         <input id="tags" name="tags" placeholder="Теги" class="form-control here" type="text" required>
                                         </div>
                                     </div> 
+                                </div>                                
+                            </div>
 
+                            <div class="card mb-3" style="max-width: 18rem;">
+                                <div class="card-header bg-light">Тип поста</div>
+                                <div class="card-body">
+                                    <div class="form-group row">
+                                        <div class="col-9">
+                                            <select class="form-select"name="type" aria-label="Default select example">
+                                                <option value="news">news</option>
+                                                <option value="resources">resources</option>
+                                              </select>
+                                        </div>
+                                    </div> 
                                 </div>                                
                             </div>
 

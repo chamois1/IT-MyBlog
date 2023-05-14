@@ -7,6 +7,7 @@ from flask import Blueprint, render_template, session, redirect, url_for, reques
 from models import Posts
 from db import db
 
+
 # This file, for urls /admin, or /admin/settings other
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -35,6 +36,7 @@ def add_post():
         description = request.form['description']
         tag = request.form['tags']
         image = request.files['image-post']
+        type = request.form['type']
 
         if image:
             # Generate a unique image using UUID and save the avatar
@@ -53,7 +55,7 @@ def add_post():
             edit_tags += f'#{i} '
 
 
-        save_data = Posts(title=title, description=description, tag=edit_tags, image=image_path)
+        save_data = Posts(title=title, description=description, tag=edit_tags, image=image_path, type=type)
         db.session.add(save_data)
         db.session.commit()
 
