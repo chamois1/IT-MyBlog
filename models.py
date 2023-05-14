@@ -42,3 +42,14 @@ class Comments(db.Model):
     text = Column('text', Text)
     id_post = Column('id_post', Integer)
     id_author = Column('id_author', Integer)
+
+
+# Reply comment for main comment
+class ReplyComment(db.Model):
+    __tablename__ = "reply_comment"
+
+    id = Column('id', Integer, primary_key=True)
+    date = Column(DateTime, default=datetime.utcnow)
+    text = Column('text', Text)
+    id_main_comment = Column('id_main_comment', Integer)
+    id_author_reply = Column('id_author_reply', Integer)

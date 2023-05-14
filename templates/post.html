@@ -4,6 +4,7 @@
 
 {% block link %}
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 {% endblock %}
 
 {% block body %}
@@ -67,39 +68,60 @@
       {% for author in author_comment %}
         {% for com in comments_for_post %}
             {% if author.id == com.id_author %}
-                <!-- Single Comment -->
+                <!-- Comment -->
                 <div class="media mb-4">
                     <img style="width:50px; height:50px;  border-radius: 50%;" src="/{{ author.img_avatar }}" class="img-responsive" alt="avatar author">
                     <div class="media-body">
                     
-                        <h5 class="mt-0"> {{author.login}}</h5>
-                        
-                        {{ com.text }}
+                        <h4 style="color: #999999; font-size: 0.8em;" class="mt-0"> {{com.date}}</h4>
+                        <h3 class="mt-0"> {{author.login}}</h3>
+                        <h5>{{ com.text }}</h5>
+
+                          <button type="submit" onclick="replyBtn( '{{ author.id }}' )">Відповісти</button>
+
+                          <form method="POST">
+                            <div id="reply-container-{{ author.id }}" style="display:none;">
+                              <input type="hidden" name="comment-id" value="{{ author.id }}"> 
+                              <input type="text" name="reply-text" placeholder="Введіть відповідь на коментарь">
+                              <button type="submit">Відповісти</button>
+                            </div>
+
+                          </form>
+
+                          <script>
+                            function replyBtn(authorId) {
+                              var replyContainer = document.getElementById("reply-container-" + authorId);
+                              if (replyContainer.style.display === "none") {
+                                replyContainer.style.display = "block";
+                              } else {
+                                replyContainer.style.display = "none";
+                              }
+                            }                            
+                          </script>
+
+
+                          <!-- Replys -->
+                          {% for reply in replys_comments %}
+                            {% if reply.id_main_comment == com.id %}
+                              <div class="media mt-4">
+        
+                                {% for i in author_comment %}
+                                  {% if i.id == reply.id_author_reply %}
+                                
+                                    <h5 class="mt-0">{{ i.login }}</h5>
+                                    {{ reply.text }}
+                                  {% endif %}
+                                
+                                {% endfor %}
+                              </div>
+                            {% endif %}
+                          {% endfor %}
                     </div>
                 </div>
             {% endif %}
         {% endfor %}
       {% endfor %}
 
-      <!-- Comments -->
-      <div class="media mb-4">
-        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-        <div class="media-body">
-          <h5 class="mt-0">Commenter Name</h5>
-          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-
-         
-
-          <div class="media mt-4">
-            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-            <div class="media-body">
-              <h5 class="mt-0">Commenter Name</h5>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-            </div>
-          </div>
-
-        </div>
-      </div>
 
     <section class="footer-link"><h2>Contacts</h2></section>
     {% endfor %}
