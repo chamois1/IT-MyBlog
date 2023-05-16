@@ -1,45 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'admin_panel.html' %}
 
 {% block title %} Добавити пост {% endblock %}
 
-{% block link %}
-<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/admin_panel.css') }}">
-<link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-{% endblock %}
 
-{% block body %} 
-<!-- Nav bar left -->
-<div class="row">
-    <!-- Menu -->
-    <div class="side-menu">    
-    <nav class="navbar navbar-default" role="navigation">
-
-    <div class="navbar-header">
-        <div class="brand-wrapper">
-            <div class="brand-name-wrapper">
-                <a class="navbar-brand" href="#">
-                    Адмін панель
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Menu -->  
-    <div class="side-menu-container">
-        <ul class="nav navbar-nav">
-            <li><a href="/admin/add-post"><span class="glyphicon glyphicon-send"></span>Добавити пост</a></li>
-            <li class="active"><a href="#"><span class="glyphicon glyphicon-pencil"></span>Редагувати пости</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-user"></span>Користувачі</a></li>
-        </ul>
-    </div>
-</nav>
-    </div>
-</div>
-
-
-<!-- Create post -->
-<div class="side-body">
+{% block content %}
     <h1>Новий пост</h1>
 
     <form method="POST" enctype="multipart/form-data">
@@ -108,6 +72,5 @@
     {{ ckeditor.load() }}
     {{ ckeditor.config(name='description') }}
 </div>
-
 
 {% endblock %}

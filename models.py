@@ -18,10 +18,14 @@ class Accounts_Users(db.Model):
     password = Column("password", String, nullable=False)
     img_avatar = Column("avatar", String, nullable=True, default='/images/avatars/default_avatar.jpeg')
 
-    is_admin = Column(Boolean, default=False)
     latter_view = Column("history_view", JSON, default=[])
     save_posts = Column("save_posts", JSON, default=[])
     like_posts = Column("like_posts", JSON, default=[])
+
+    is_admin = Column(Boolean, default=False)
+
+    is_block = Column(Boolean, default=False)
+    reason_block = Column('reason_block', String, nullable=True)
 
 
 # Posts

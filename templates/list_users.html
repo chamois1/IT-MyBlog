@@ -1,0 +1,74 @@
+{% extends 'admin_panel.html' %}
+
+{% block title %} Список користувачів {% endblock %}
+
+{% block content %}
+
+<h1>Список користувачів</h1>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+        <div class="table-responsive">
+            <table id="mytable" class="table table-bordred table-striped">
+                <thead>
+                    <th>Аватар</th>
+                    <th>Логін</th>
+                    <th>Пошта</th>
+                    <th>Блокування</th>      
+                </thead>
+                
+                {% for user in users %}
+                    {% if user.is_admin == False %}
+                        <td><img src="/{{ user.img_avatar }}" style="max-width: 10%; max-height: 10%;" class="card-img-top" alt="image user"></td>
+                        <td>{{ user.login }}</td>
+                        <td>{{user.email}}</td>
+                        
+
+                        {% if user.is_block == False %}
+                            <td><button class="btn btn-danger btn-xs" onclick="showWindow('{{ user.id }}')"><span class="glyphicon glyphicon-remove-sign"></span> Заблокувати</button></td>
+                        {% else %}
+                            <form method="POST"> 
+                                <input name="unblock-user" value="{{ user.id }}">
+                                <td><button class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-sign"></span> Розблокувати</button></td>
+                            </form>
+                        {% endif %}
+                        
+
+                        <!-- Window form  -->
+                        <div id="WindowReson" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="hideWindow()">&times;</span>
+                            <span>Напишіть причину блокування</span>
+
+                            <form method="POST" onsubmit="submitForm(event)">
+                                <input type="hidden" name="id-block-user" id="id-block-user" value="{{ user.id }}" required>
+                                <input type="text" name="reason-block" id="reasonBlockInput" required>
+                                <button type="submit">Заблокувати</button>
+                            </form>
+                        </div>
+                        </div>
+
+                        
+                        <script>
+                        function showWindow(userId) {
+                            var window = document.getElementById("WindowReson");
+                            var id_block_user = document.getElementById("id-block-user");
+                            id_block_user.value = userId;
+                            window.style.display = "block";
+                        }
+                            
+
+                        function hideWindow() {
+                            var window = document.getElementById("WindowReson");
+                            window.style.display = "none";
+                        }
+                        </script>
+                                    
+                        <tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+
+{% endblock %}

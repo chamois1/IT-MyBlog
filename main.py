@@ -25,7 +25,6 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(posts_bp)
 app.register_blueprint(profiles)
 
-
 # config
 app.config['SECRET_KEY'] = '(#U(@FU*AUF*UIAJ091E)!(@#$*190()$!2497() FUIAJQIJ*($@#!*7EDSAIJIDJAS)))'
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -111,12 +110,16 @@ def sign_in():
             flash('Такого користувача не існує')
             return redirect('/sign-in')
        
+       elif search_account.is_block == True:
+           flash(f'Ви були заблоковані, по причині\n "{search_account.reason_block}"')
+           return redirect('/sign-in')
+       
+
        if check_password_hash(search_account.password, password):
            # save session
            session['id'] = search_account.id
            session['is_admin'] = search_account.is_admin
            return redirect('/my-profile')
-       
        else:
            flash('Пароль не вірний')
            return redirect('/sign-in')

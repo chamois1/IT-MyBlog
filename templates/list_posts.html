@@ -1,0 +1,41 @@
+{% extends 'admin_panel.html' %}
+
+{% block title %} Список постів {% endblock %}
+
+{% block content %}
+    <h1>Список постів</h1>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+            <div class="table-responsive">
+                <table id="mytable" class="table table-bordred table-striped">
+                    <thead>
+                        <th>Превью</th>
+                        <th>Дата</th>
+                        <th>Пост</th>
+                        <th>Тип</th>
+                        <th>Видалити</th>
+                        <th>Редагувати</th>
+                    </thead>
+                    
+                    {% for post in posts %}
+
+                        <td><img src="/{{ post.image }}" style="max-width: 10%; max-height: 10%;" class="card-img-top" alt="image post"></td>
+                        <td>{{post.date}}</td>
+                        <td><a href="/post/{{ post.title }}/{{ post.id }}">{{ post.title }}</a></td>
+                
+                        <td>{{post.type}}</td>
+                        
+                        <form method="POST">
+                            <input type="hidden" name="post-delete" value="{{ post.id }}">
+                            <td><button class="btn btn-danger btn-xs" ><span class="glyphicon glyphicon-trash"></span></button></td>
+                        </form>
+                        
+                        <td><a href="/admin/list-posts/editor-post/{{ post.title }}/{{ post.id }}"><button class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></span></button></td></a>
+                        
+                        <tr>
+                    {% endfor %}
+                </table>
+
+{% endblock %}
