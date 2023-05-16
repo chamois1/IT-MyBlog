@@ -1,0 +1,31 @@
+{% extends 'my_profile.html' %}
+
+{% block title %} Збережені пости {% endblock %}
+
+{% block content %}
+
+<h1>Збережені пости</h1>
+{% if save_posts %}
+    {% for post in save_posts %}
+        <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 mt-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <a href="/post/{{ post.title }}/{{ post.id }}">
+                        <img src="/{{ post.image }}" style="max-width: 150px;  max-height: 200px" class="card-img-top" alt="image post">
+                    </a>
+                    <ul class="list-inline mt-3">
+                        <li class="list-inline-item"><i class="far fa-clock"></i> {{ post.date }}</li>
+                    </ul>
+                    <hr>
+                    <p class="lead">{{ post.title }}</p>
+                    <a class="btn btn-outline-dark my-2" href="/post/{{ post.title }}/{{ post.id }}" role="button">Читати більше</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <h1>Пусто</h1>
+{% endif %}
+
+
+{% endblock %}

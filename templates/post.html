@@ -16,10 +16,9 @@
 {% for post in posts %}
     <img style="max-width: 30%; position:absolute;" src="/{{ post.image }}"  alt="image post">
 
-
     <section class="post-content-section">
     <div class="container">
-
+            <!-- Info for post -->
             <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 post-title-block">
                 <h1 style="text-align: center;">{{ post.title }}</h1>
@@ -28,99 +27,123 @@
             <div class="col-lg-9 col-md-9 col-sm-12">
                 <h2 class="lead">{{ post.description|safe }}</h2>
 
-                
-                </div>
-                <div class="col-lg-3  col-md-3 col-sm-12">
-                    {% for new in all_news %}
-                    <div class="card shadow">
-                        <div class="card-body text-center">
-                            <a href="/post/{{ new.title }}/{{ new.id }}">
-                                <img src="/{{ new.image }}" class="card-img-top" alt="image new">
-                            </a>
-                            <ul class="list-inline mt-3">
-                                <li class="list-inline-item"><i class="far fa-clock"></i> {{ new.date }}</li>
-                            </ul>
-                            <hr>
-                            <p class="lead">{{ new.title }}</p>
-                            <a class="btn btn-outline-dark my-2" href="/post/{{ new.title }}/{{ new.id }}" role="button">Читати більше</a>
-                        </div>
-                    </div>
-                    <br>
-                    {% endfor %}
-                </div>
-                
+              
+            <!-- Buttons -->
+            {% for author in author_comment %}
+              <form method="POST">
+                <input type="hidden" name="save_post">
+                <button type="submit" class="btn btn-primary">Зберегти <i class="bi bi-save"></i></button>
+              </form>
+              <br>
 
+              <form method="POST">
+                <input type="hidden" name="like_post">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-hand-thumbs-up-fill"></i></button>
+              </form>
+            {% endfor %}
+                
+            <!-- Comments -->
+            <div class="card my-4">
+              <h5 class="card-header">Прокоментуйте пост | прокоментовало {{post.comments|length}}</h5>
+              <div class="card-body">
+                <form method="POST">
+                  <div class="form-group">
+                    <textarea name="text_comment" class="form-control" rows="3"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Готово</button>
+                </form>
+              </div>
+            </div>
+
+                </div>
+
+            <!-- Side Blocks all posts -->
+            <div class="col-lg-3  col-md-3 col-sm-12">
+                {% for new in all_news %}
+                <div class="card shadow">
+                    <div class="card-body text-center">
+                        <a href="/post/{{ new.title }}/{{ new.id }}">
+                            <img src="/{{ new.image }}"  class="card-img-top" alt="image new">
+                        </a>
+                        <ul class="list-inline mt-3">
+                            <li class="list-inline-item"><i class="far fa-clock"></i> {{ new.date }}</li>
+                        </ul>
+                        <hr>
+                        <p class="lead">{{ new.title }}</p>
+                        <a class="btn btn-outline-dark my-2" href="/post/{{ new.title }}/{{ new.id }}" role="button">Читати більше</a>
+                    </div>
+                </div>
+                <br>
+                {% endfor %}
+            </div>
+
+
+                {% for author in author_comment %}
+                {% for com in comments_for_post %}
+                    {% if author.id == com.id_author %}
+                        <!-- Comment -->
+                        <div class="media mb-4">
+                            <img style="width:50px; height:50px;  border-radius: 50%;" src="/{{ author.img_avatar }}" class="img-responsive" alt="avatar author">
+                            <div class="media-body">
+                            
+                                <h4 style="color: #999999; font-size: 0.8em;" class="mt-0"> {{com.date}}</h4>
+                                <h3 class="mt-0"> {{author.login}}</h3>
+                                <h5>{{ com.text }}</h5>
+                                
+                                  <form method="POST">
+                                    <input type="hidden" name="comment_id_like" value="{{ author.id }}">
+                                    <button type="submit"><i class="bi bi-hand-thumbs-up-fill"></i></button>        
+                                  </form>
+        
+                                  <br>
+        
+                                  <button type="submit" onclick="replyBtn( '{{ author.id }}' )">Відповісти</button>
+        
+                                  <form method="POST">
+                                    <div id="reply-container-{{ author.id }}" style="display:none;">
+                                      <input type="hidden" name="comment-id" value="{{ author.id }}"> 
+                                      <input type="text" name="reply-text" placeholder="Введіть відповідь на коментарь">
+                                      <button type="submit">Відповісти</button>
+                                    </div>
+        
+                                  </form>
+        
+                                  <script>
+                                    function replyBtn(authorId) {
+                                      var replyContainer = document.getElementById("reply-container-" + authorId);
+                                      if (replyContainer.style.display === "none") {
+                                        replyContainer.style.display = "block";
+                                      } else {
+                                        replyContainer.style.display = "none";
+                                      }
+                                    }                            
+                                  </script>
+        
+        
+                                  <!-- Replys -->
+                                  {% for reply in replys_comments %}
+                                    {% if reply.id_main_comment == com.id %}
+                                      <div class="media mt-4">
+                                        <img class="d-flex mr-3 rounded-circle" src="http://plac  ehold.it/50x50" alt="">
+                                        {% for i in author_comment %}
+                                          {% if i.id == reply.id_author_reply %}
+                                        
+                                            <h5 class="mt-0">{{ i.login }}</h5>
+                                            {{ reply.text }}
+                                          {% endif %}
+                                        
+                                        {% endfor %}
+                                      </div>
+                                    {% endif %}
+                                  {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+              {% endfor %}
+        
     </div> <!-- /container -->
     </section>
-
-    <div class="card my-4">
-        <h5 class="card-header">Прокоментуйте пост</h5>
-        <div class="card-body">
-          <form method="POST">
-            <div class="form-group">
-              <textarea name="text_comment" class="form-control" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Готово</button>
-          </form>
-        </div>
-      </div>
-
-      {% for author in author_comment %}
-        {% for com in comments_for_post %}
-            {% if author.id == com.id_author %}
-                <!-- Comment -->
-                <div class="media mb-4">
-                    <img style="width:50px; height:50px;  border-radius: 50%;" src="/{{ author.img_avatar }}" class="img-responsive" alt="avatar author">
-                    <div class="media-body">
-                    
-                        <h4 style="color: #999999; font-size: 0.8em;" class="mt-0"> {{com.date}}</h4>
-                        <h3 class="mt-0"> {{author.login}}</h3>
-                        <h5>{{ com.text }}</h5>
-
-                          <button type="submit" onclick="replyBtn( '{{ author.id }}' )">Відповісти</button>
-
-                          <form method="POST">
-                            <div id="reply-container-{{ author.id }}" style="display:none;">
-                              <input type="hidden" name="comment-id" value="{{ author.id }}"> 
-                              <input type="text" name="reply-text" placeholder="Введіть відповідь на коментарь">
-                              <button type="submit">Відповісти</button>
-                            </div>
-
-                          </form>
-
-                          <script>
-                            function replyBtn(authorId) {
-                              var replyContainer = document.getElementById("reply-container-" + authorId);
-                              if (replyContainer.style.display === "none") {
-                                replyContainer.style.display = "block";
-                              } else {
-                                replyContainer.style.display = "none";
-                              }
-                            }                            
-                          </script>
-
-
-                          <!-- Replys -->
-                          {% for reply in replys_comments %}
-                            {% if reply.id_main_comment == com.id %}
-                              <div class="media mt-4">
-        
-                                {% for i in author_comment %}
-                                  {% if i.id == reply.id_author_reply %}
-                                
-                                    <h5 class="mt-0">{{ i.login }}</h5>
-                                    {{ reply.text }}
-                                  {% endif %}
-                                
-                                {% endfor %}
-                              </div>
-                            {% endif %}
-                          {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-      {% endfor %}
 
 
     <section class="footer-link"><h2>Contacts</h2></section>

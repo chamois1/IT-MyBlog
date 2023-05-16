@@ -5,8 +5,8 @@
 {% block link %}
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/my_profile.css') }}">
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 {% endblock %}
 
 {% block body %}
@@ -16,13 +16,12 @@
     }
 </style>
 
-
 <div class="container">
     <div class="row profile">
 		<div class="col-md-3">
 			<div class="profile-sidebar">
 				<div class="profile-userpic">
-					<img src="{{ account.img_avatar }}" class="img-responsive" alt="">
+					<img src="/{{ account.img_avatar }}" class="img-responsive" alt="avatar">
 				 </div>
 				 
 				<div class="profile-usertitle">
@@ -40,7 +39,6 @@
 						</div>
 					</form>
 				</div>
-				
 			
 				<div class="profile-usermenu">
 					<ul class="nav">
@@ -52,44 +50,58 @@
 						</li>
 						{% endif %}
 
-						<li class="active">
-							<a href="/">
-							<i class="glyphicon glyphicon-home"></i>
-							Головна сторінка</a>
-						</li>
 						<li>
-							<a href="#">
+							<a href="/my-profile/settings">
 							<i class="glyphicon glyphicon-cog"></i>
-							Налаштування акаунта </a>
+							Налаштування профілю </a>
 						</li>
 						<li>
-							<a href="/" target="_blank">
-							<i class="glyphicon glyphicon-ok"></i>
+							<a href="/my-profile/save-posts">
+							<i class="bi bi-save"></i>
 							Збережені пости </a>
 						</li>
 						<li>
-							<a href="/" target="_blank">
-							<i class="glyphicon glyphicon-ok"></i>
+							<a href="/my-profile/like-posts">
+							<i class="bi bi-bookmark-heart"></i>
 							Вподобані пости </a>
 						</li>
 						<li>
-							<a href="/" target="_blank">
-							<i class="glyphicon glyphicon-ok"></i>
-							Список коментарів </a>
+							<a href="/my-profile/history-comments">
+							<i class="bi bi-card-list"></i>
+							Історія коментарів </a>
 						</li>
 					</ul>
 				</div>
 			</div>
 		</div>
 		<div class="col-md-9">
-            <div class="profile-content">
-                <h1>Останій перегляд постів</h1>
-            </div>
+		{% block content %}
+			<h1>Останні переглянуті пости</h1>
+			{% if latter_posts %}
+				{% for post in latter_posts %}
+					<div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 mt-4">
+						<div class="card shadow">
+							<div class="card-body text-center">
+								<a href="/post/{{ post.title }}/{{ post.id }}">
+									<img src="{{ post.image }}" style="max-width: 150px;  max-height: 200px" class="card-img-top" alt="image post">
+								</a>
+								<ul class="list-inline mt-3">
+									<li class="list-inline-item"><i class="far fa-clock"></i> {{ post.date }}</li>
+								</ul>
+								<hr>
+								<p class="lead">{{ post.title }}</p>
+								<a class="btn btn-outline-dark my-2" href="/post/{{ post.title }}/{{ post.id }}" role="button">Читати більше</a>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			{% else %}
+				<h1>Пусто</h1>
+			{% endif %}
+		{% endblock %}
+			</div>
 		</div>
 	</div>
 </div>
-<br>
-<br>
-
 
 {% endblock %}

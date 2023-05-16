@@ -1,0 +1,72 @@
+{% extends 'my_profile.html' %}
+
+{% block title %} Налаштування профіля {% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <h1 style="color:red">
+        {% with messages = get_flashed_messages() %}
+           {% if messages %}
+              {% for message in messages %}
+                 {{ message }}
+              {% endfor %}
+           {% endif %}
+        {% endwith %}
+     </h1>
+
+
+    <form method="POST" role="form" style="width:400px; margin: 0 auto;" enctype="multipart/form-data" onsubmit="return checkPasswords()">
+        <h1>Налаштування профілю</h1>
+
+        <br>
+        
+        <div class="required-field-block">
+            <input type="text" name="login" placeholder="Логін" class="form-control" value="{{ account.login }}" required>
+        </div>
+        
+        <br>
+
+        <div class="required-field-block">
+            <input type="email" name="email" placeholder="Email" class="form-control" value="{{ account.email }}">
+        </div>
+
+        <br>
+
+        <input type="password" name="actual_password" placeholder="Поточний пароль" class="form-control" required>
+        
+        <br>
+
+        <input type="password" name="password" placeholder="новий пароль" class="form-control">
+
+        <br>
+        
+        <input type="password" name="new_password" placeholder="Підтвердити пароль" class="form-control">
+        
+        <br>
+        
+        <input type="file" accept="image/" name="avatar" class="form-control">
+        
+        <br>
+    
+        <script>
+            function checkPasswords() {
+                var password = document.getElementsByName("password")[0];
+                var new_password = document.getElementsByName("new_password")[0];
+              
+                if (password.value !== new_password.value) {
+                  alert("Паролі не співпадають!");
+                  return false;
+                }
+              
+                return true;
+            }   
+        </script>
+
+        <button class="btn btn-primary">Підтвердити</button>
+    </form>
+</div>
+
+
+
+{% endblock %}

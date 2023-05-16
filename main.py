@@ -1,16 +1,16 @@
 import os
 import uuid
-from functools import wraps
 
-from flask import Flask, render_template, request, redirect, flash, session, url_for
+from flask import Flask, render_template, request, redirect, flash, session
 from flask_session import Session
 from flask_bcrypt import Bcrypt, check_password_hash
 from flask_ckeditor import CKEditor
 
 from db import db_init, db
 from models import Accounts_Users
-from admin_panel import admin_bp
-from posts_routes import posts_bp
+from routes.admin_panel import admin_bp
+from routes.posts_routes import posts_bp
+from routes.profile_users import profiles
 
 """
 This file for starting server, settings and users authorizations
@@ -23,6 +23,8 @@ ckeditor = CKEditor(app)
 # urls from file admin_panel
 app.register_blueprint(admin_bp)
 app.register_blueprint(posts_bp)
+app.register_blueprint(profiles)
+
 
 # config
 app.config['SECRET_KEY'] = '(#U(@FU*AUF*UIAJ091E)!(@#$*190()$!2497() FUIAJQIJ*($@#!*7EDSAIJIDJAS)))'
@@ -33,15 +35,6 @@ app.config['UPLOAD_FOLDER'] = 'static/images/'
 
 db_init(app)
 Session(app)
-
-# decorator, checking session on user, whether the user is logged into the account
-def session_required(f):
-    @wraps(f)
-    def decorated_if_session(*args, **kwargs):
-        if 'id' not in session:
-            return redirect(url_for('sign_in'))
-        return f(*args, **kwargs)
-    return decorated_if_session
 
 
 # function will pass variables for all html
@@ -81,8 +74,10 @@ def sign_up():
             if avatar:
                 # Generate a unique image using UUID and save the avatar
                 img = str(uuid.uuid4()) + os.path.splitext(avatar.filename)[1]
-                avatar.save(os.path.join(app.config['UPLOAD_FOLDER'] + f'avatars/{img}'))
-                avatar_path = os.path.join(app.config['UPLOAD_FOLDER'] + f'avatars/{img}')
+                app_config = os.path.join(app.config['UPLOAD_FOLDER'] + f'avatars/{img}') 
+
+                avatar.save(app_config)
+                avatar_path = os.path.join(app_config)
             else: 
                 avatar_path = app.config['UPLOAD_FOLDER'] + '/avatars/default_avatar.jpg'
 
@@ -91,7 +86,7 @@ def sign_up():
             save_data = Accounts_Users(img_avatar=avatar_path, login=login, email=email, password=password_hash)
             db.session.add(save_data)
             db.session.commit()
-                
+            
 
             return redirect('/sign-in')
        else:
@@ -128,19 +123,6 @@ def sign_in():
 
     return render_template('sign_in.html')
 
-
-@app.route('/my-profile', methods=['POST', 'GET'])
-@session_required
-def my_profile():
-    id_session = session.get('id')
-    account = db.session.query(Accounts_Users).filter_by(id=id_session).first()
-
-    # button
-    if 'logout' in request.form:
-        session.clear()
-        return redirect('sign-in')
-
-    return render_template('my_profile.html', account=account)
 
 
 if __name__ == '__main__':

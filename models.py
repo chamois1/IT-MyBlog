@@ -1,6 +1,6 @@
 from datetime import datetime
 from db import db
-from sqlalchemy import Column, String, Integer, DateTime, Text, Boolean
+from sqlalchemy import Column, String, Integer, DateTime, Text, Boolean, JSON, ForeignKey
 
 
 # Column accounts for users
@@ -17,7 +17,11 @@ class Accounts_Users(db.Model):
     email = Column("emai", String(25), nullable=False)
     password = Column("password", String, nullable=False)
     img_avatar = Column("avatar", String, nullable=True, default='/images/avatars/default_avatar.jpeg')
+
     is_admin = Column(Boolean, default=False)
+    latter_view = Column("history_view", JSON, default=[])
+    save_posts = Column("save_posts", JSON, default=[])
+    like_posts = Column("like_posts", JSON, default=[])
 
 
 # Posts
@@ -32,6 +36,9 @@ class Posts(db.Model):
     image = Column("image", String, nullable=True, default='/images/posts/default_post.jpeg')
     type = Column('type', String)
 
+    # connections of models
+    comments = db.relationship('Comments', backref='post', lazy=True)
+
 
 # Comments for post
 class Comments(db.Model):
@@ -40,7 +47,8 @@ class Comments(db.Model):
     id = Column("id", Integer, primary_key=True)
     date = Column(DateTime, default=datetime.utcnow)
     text = Column('text', Text)
-    id_post = Column('id_post', Integer)
+    id_post = Column('id_post', Integer, ForeignKey('posts.id'))
+    title_post = Column('title_post', String)
     id_author = Column('id_author', Integer)
 
 
