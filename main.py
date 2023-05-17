@@ -5,9 +5,11 @@ from flask import Flask, render_template, request, redirect, flash, session
 from flask_session import Session
 from flask_bcrypt import Bcrypt, check_password_hash
 from flask_ckeditor import CKEditor
+from flask_paginate import Pagination, get_page_args
+from sqlalchemy import or_ 
 
 from db import db_init, db
-from models import Accounts_Users
+from models import Accounts_Users, Posts
 from routes.admin_panel import admin_bp
 from routes.posts_routes import posts_bp
 from routes.profile_users import profiles
@@ -45,9 +47,31 @@ def session_base():
 
 
 # Main page
-@app.route('/')
-def index():    
+@app.route('/', methods=['POST', 'GET'])
+def index():
+
+    # search field
+    if request.method == 'POST':
+        search = request.form['search']
+        return redirect(f'/search/{search}')
+
     return render_template('index.html')
+
+
+# result search 
+@app.route('/search/<string:search>')
+def result_posts(search):
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # search context word
+    # Apply pagination, and create object paginations
+    query  = Posts.query.filter(or_(Posts.title.like(f'%{search}%'), Posts.description.like(f'%{search}%')))
+    result_search = query.offset(offset).limit(per_page).all()    
+
+    pagination = Pagination(page=page, per_page=per_page, total=Posts.query.count(), css_framework='bootstrap4')
+
+    return render_template('result_search.html', search=search, result_search=result_search, pagination=pagination)
 
 
 # Sign up

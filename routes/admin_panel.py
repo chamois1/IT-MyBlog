@@ -3,6 +3,7 @@ import uuid
 from functools import wraps
 
 from flask import Blueprint, render_template, session, redirect, request, current_app
+from flask_paginate import Pagination, get_page_args
 
 from models import Posts, Accounts_Users
 from db import db
@@ -10,7 +11,6 @@ from db import db
 
 # This file, for urls /admin, or /admin/settings other
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
-
 
 # decorator, checking of admin user or not, and authorization
 def is_admin(f):
@@ -72,7 +72,15 @@ def add_post():
 @admin_bp.route('/list-posts', methods=['POST', 'GET'])
 @is_admin
 def list_posts():
-    posts = db.session.query(Posts).all()
+    """ Get all posts and pagination to split them into multiple pages """
+
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # Apply pagination, and create object paginations
+    posts = Posts.query.offset(offset).limit(per_page).all()
+    pagination = Pagination(page=page, per_page=per_page, total=Posts.query.count(), css_framework='bootstrap4')
+
 
     if 'post-delete' in request.form:
         id_post = request.form['post-delete']
@@ -83,7 +91,7 @@ def list_posts():
         return redirect('./list-posts')
     
 
-    return render_template('list_posts.html', posts=posts)
+    return render_template('list_posts.html', posts=posts, pagination=pagination)
 
 
 # edit post
@@ -138,7 +146,13 @@ def editor_posts(title, id):
 @admin_bp.route('/list-users', methods=['POST', 'GET'])
 @is_admin
 def list_users():
-    users = db.session.query(Accounts_Users).all()
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # Apply pagination, and create object paginations
+    users = Accounts_Users.query.offset(offset).limit(per_page).all()
+    pagination = Pagination(page=page, per_page=per_page, total=Posts.query.count(), css_framework='bootstrap4')
+
 
     # block user
     if 'reason-block' in request.form:
@@ -167,4 +181,4 @@ def list_users():
         return redirect('/admin/list-users')
 
 
-    return render_template('list_users.html', users=users)
+    return render_template('list_users.html', users=users, pagination=pagination)

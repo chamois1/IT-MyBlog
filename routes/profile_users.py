@@ -3,15 +3,14 @@ import uuid
 from functools import wraps
 
 from flask import render_template, request, redirect, flash, session, url_for, Blueprint, current_app
+from flask_paginate import Pagination, get_page_args
 from flask_bcrypt import Bcrypt, check_password_hash
 
 from db import db
 from models import Accounts_Users, Posts, Comments
 
-
 # This file, for urls /my-profile/settings, or other
 profiles = Blueprint('my-profile', __name__)
-
 
 # decorator, checking session on user, whether the user is logged into the account
 def auth_user(f):
@@ -104,7 +103,14 @@ def settings_profile(id_user, account):
 @profiles.route('/my-profile/history-comments', methods=['POST', 'GET'])
 @auth_user
 def history_comments(id_user, account):
-    comments = db.session.query(Comments).filter_by(id_author=id_user).all()
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # Apply pagination, and create object paginations
+    query  = Comments.query.filter_by(id_author=id_user)
+    comments = query.offset(offset).limit(per_page).all()
+
+    pagination = Pagination(page=page, per_page=per_page, total=Comments.query.count(), css_framework='bootstrap4')
 
     # button delete comment
     if request.method == 'POST':
@@ -116,14 +122,21 @@ def history_comments(id_user, account):
         return redirect('./history-comments')
 
 
-    return render_template('history_comments.html', account=account, comments=comments)        
+    return render_template('history_comments.html', account=account, comments=comments, pagination=pagination)        
 
 
 # save posts
 @profiles.route('/my-profile/save-posts', methods=['POST', 'GET'])
 @auth_user
 def save_posts(id_user, account):
-    save_posts = db.session.query(Posts).filter(Posts.id.in_(account.save_posts)).all()
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # Apply pagination, and create object paginations
+    query  = Posts.query.filter(Posts.id.in_(account.save_posts))
+    save_posts = query.offset(offset).limit(per_page).all()    
+    pagination = Pagination(page=page, per_page=per_page, total=Comments.query.count(), css_framework='bootstrap4')
+
 
     if 'delete-save-post' in request.form:
         delete_save_post = request.form['delete-save-post']
@@ -137,14 +150,20 @@ def save_posts(id_user, account):
         return redirect('./save-posts')
     
 
-    return render_template('save_posts.html', account=account, save_posts=save_posts)
+    return render_template('save_posts.html', account=account, save_posts=save_posts, pagination=pagination)
 
 
 # like posts
 @profiles.route('/my-profile/like-posts', methods=['POST', 'GET'])
 @auth_user
 def like_post(id_user, account):
-    like_posts = db.session.query(Posts).filter(Posts.id.in_(account.like_posts)).all()
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # Apply pagination, and create object paginations
+    query  = Posts.query.filter(Posts.id.in_(account.like_posts))
+    like_posts = query.offset(offset).limit(per_page).all()    
+    pagination = Pagination(page=page, per_page=per_page, total=Comments.query.count(), css_framework='bootstrap4')
 
     if 'delete-like-post' in request.form:
         delete_like_post = request.form['delete-like-post']
@@ -158,4 +177,4 @@ def like_post(id_user, account):
         return redirect('./like-posts')
         
 
-    return render_template('like_post.html', account=account, like_posts=like_posts)
+    return render_template('like_post.html', account=account, like_posts=like_posts, pagination=pagination)

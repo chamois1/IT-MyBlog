@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, request
+from flask_paginate import Pagination, get_page_args
 
 from models import Posts, Comments, Accounts_Users, ReplyComment
 from db import db
@@ -9,16 +10,24 @@ posts_bp = Blueprint('post', __name__)
 
 @posts_bp.route('/news')
 def news_posts():
-    posts = db.session.query(Posts).filter_by(type='news').all()
-    return render_template('news.html', posts=posts)
+    """ Geting all posts for 'news', and pagination to split them into multiple pages """
+
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # Apply pagination, and create object paginations
+    query  = Posts.query.filter_by(type='news')
+    posts = query.offset(offset).limit(per_page).all()
+
+    pagination = Pagination(page=page, per_page=per_page, total=Posts.query.count(), css_framework='bootstrap4')
+    
+    return render_template('news.html', posts=posts, pagination=pagination)
 
 
 @posts_bp.route('/post/<string:title>/<int:id>', methods=['POST', 'GET'])
 def post(title, id):
-    """
-    See post
-    Adding Comment, reply, other
-    """
+    """ See post. Adding Comment, reply, other """
+
     response = redirect(f'/post/{title}/{id}')
     session_id_author = session.get('id')
 
@@ -116,6 +125,7 @@ def post(title, id):
 
     author_comment = db.session.query(Accounts_Users).all()     
     
+
     context = {
         'posts': posts,
         'all_posts': all_posts,
@@ -124,6 +134,4 @@ def post(title, id):
         'replys_comments': replys_comments,
         'user': user
     }
-
-
     return render_template('post.html', **context)    
