@@ -64,4 +64,7 @@ class ReplyComment(db.Model):
     date = Column(DateTime, default=datetime.utcnow)
     text = Column('text', Text)
     id_main_comment = Column('id_main_comment', Integer)
+
     id_author_reply = Column('id_author_reply', Integer)
+    login_author_reply = Column('login_author_reply', String)
+    avatar_author_reply = Column('avatar_author_reply', String)

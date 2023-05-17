@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} Post name {% endblock %}
+{% block title %} Post {{ posts.id }} {% endblock %}
 
 {% block link %}
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -11,6 +11,39 @@
 <style>
     .post-title-block{padding:100px 0;}
     .footer-link{float:left; width:100%; background:#222222; text-align:center; padding:30px;}
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+    }
+    
+    .close {
+      color: #888;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover {
+      color: #000;
+    }
 </style>
 
 {% for post in posts %}
@@ -29,19 +62,18 @@
 
               
             <!-- Buttons -->
-            {% for author in author_comment %}
-              <form method="POST">
-                <input type="hidden" name="save_post">
-                <button type="submit" class="btn btn-primary">Зберегти <i class="bi bi-save"></i></button>
-              </form>
-              <br>
+            <form method="POST">
+              <input type="hidden" name="save_post">
+              <button type="submit" class="btn btn-primary">Зберегти <i class="bi bi-save"></i></button>
+            </form>
+            <br>
 
-              <form method="POST">
-                <input type="hidden" name="like_post">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-hand-thumbs-up-fill"></i></button>
-              </form>
-            {% endfor %}
-                
+            <form method="POST">
+              <input type="hidden" name="like_post">
+              <button type="submit" class="btn btn-primary"><i class="bi bi-hand-thumbs-up-fill"></i></button>
+            </form>
+      
+              
             <!-- Comments -->
             <div class="card my-4">
               <h5 class="card-header">Прокоментуйте пост | прокоментовало {{post.comments|length}}</h5>
@@ -59,94 +91,202 @@
 
             <!-- Side Blocks all posts -->
             <div class="col-lg-3  col-md-3 col-sm-12">
-                {% for new in all_news %}
+                {% for post in all_posts %}
                 <div class="card shadow">
                     <div class="card-body text-center">
-                        <a href="/post/{{ new.title }}/{{ new.id }}">
-                            <img src="/{{ new.image }}"  class="card-img-top" alt="image new">
+                        <a href="/post/{{ post.title }}/{{ post.id }}">
+                            <img src="/{{ post.image }}"  class="card-img-top" alt="image post">
                         </a>
                         <ul class="list-inline mt-3">
-                            <li class="list-inline-item"><i class="far fa-clock"></i> {{ new.date }}</li>
+                            <li class="list-inline-item"><i class="far fa-clock"></i> {{ post.date }}</li>
                         </ul>
                         <hr>
-                        <p class="lead">{{ new.title }}</p>
-                        <a class="btn btn-outline-dark my-2" href="/post/{{ new.title }}/{{ new.id }}" role="button">Читати більше</a>
+                        <p class="lead">{{ post.title }}</p>
+                        <a class="btn btn-outline-dark my-2" href="/post/{{ post.title }}/{{ post.id }}" role="button">Читати більше</a>
                     </div>
                 </div>
                 <br>
                 {% endfor %}
             </div>
 
-
-                {% for author in author_comment %}
+            <!-- Comments -->
+            <div class="container">    
+              {% for author in author_comment %}
                 {% for com in comments_for_post %}
-                    {% if author.id == com.id_author %}
-                        <!-- Comment -->
-                        <div class="media mb-4">
-                            <img style="width:50px; height:50px;  border-radius: 50%;" src="/{{ author.img_avatar }}" class="img-responsive" alt="avatar author">
-                            <div class="media-body">
-                            
-                                <h4 style="color: #999999; font-size: 0.8em;" class="mt-0"> {{com.date}}</h4>
-                                <h3 class="mt-0"> {{author.login}}</h3>
-                                <h5>{{ com.text }}</h5>
-                                
-                                  <form method="POST">
-                                    <input type="hidden" name="comment_id_like" value="{{ author.id }}">
-                                    <button type="submit"><i class="bi bi-hand-thumbs-up-fill"></i></button>        
-                                  </form>
+                    <ul class="media-list">
+                      <li class="media">
+                      
+                        <img class="media-object img-circle" style="max-width: 5%" src="/{{ author.img_avatar }}" alt="profile">
+                      
+                        <div class="media-body">
+                          <div class="well well-lg" style="max-width: 770px">
+                              <h4 class="media-heading text-uppercase reviews"> {{author.login}} </h4>
+                              <ul class="media-date text-uppercase reviews list-inline">
+                                <li class="dd">{{com.date}}</li>
+                              </ul>
+                              <p class="media-comment">
+                                {{ com.text }}
+                              </p>
+                              {% if user.id == com.id_author %}
+                                <form method="POST">
+                                  <input type="hidden" name="del-id-my-comment" value="{{ com.id }}">
+                                  <button class="btn btn-danger btn-circle text-uppercase" type="submit"><span class="glyphicon glyphicon-trash"></span> Видалити</button>
+                                </form>
+
+                                <br>
+                                <button type="submit"  class="btn btn-success btn-circle text-uppercase" onclick="showWindowEdit('{{ com.text }}')"> <span class="glyphicon glyphicon-pencil"></span> Редагувати</button>
+
+                                <!-- Window form  -->
+                                <div id="WindowEdit" class="modal">
+                                  <div class="modal-content">
+                                      <span class="close" onclick="hideWindowEdit()">&times;</span>
+                                    
+                                      <form method="POST" onsubmit="submitForm(event)">
+                                          <input type="hidden" name="id-com-edit" id="id-com-edit" value="{{ com.id }}" required>
+                                          <input type="text" name="text_edit" id="text_edit" required>
+                                          <button type="submit">Готово</button>
+                                      </form>
+
+                                  </div>
+                                </div>
+
+
+                              {% endif %}
+                              <a class="btn btn-warning btn-circle text-uppercase" data-toggle="collapse" href="#replyOne"><span class="bi bi-hand-thumbs-up-fill"></span></a>
+                              <button class="btn btn-info btn-circle text-uppercase" type="submit" onclick="replyBtn( '{{ author.id }}' )">Відповісти</button>
+                              <button class="btn btn-success text-uppercase" onclick="ShowReplys( '{{ author.id }}' )"><span class="glyphicon glyphicon-comment"></span> Відповіді</button>
         
-                                  <br>
-        
-                                  <button type="submit" onclick="replyBtn( '{{ author.id }}' )">Відповісти</button>
-        
-                                  <form method="POST">
-                                    <div id="reply-container-{{ author.id }}" style="display:none;">
-                                      <input type="hidden" name="comment-id" value="{{ author.id }}"> 
-                                      <input type="text" name="reply-text" placeholder="Введіть відповідь на коментарь">
-                                      <button type="submit">Відповісти</button>
-                                    </div>
-        
-                                  </form>
-        
-                                  <script>
-                                    function replyBtn(authorId) {
-                                      var replyContainer = document.getElementById("reply-container-" + authorId);
-                                      if (replyContainer.style.display === "none") {
-                                        replyContainer.style.display = "block";
-                                      } else {
-                                        replyContainer.style.display = "none";
-                                      }
-                                    }                            
-                                  </script>
-        
-        
-                                  <!-- Replys -->
-                                  {% for reply in replys_comments %}
+                              <form method="POST">
+                                <div id="reply-container-{{ author.id }}" style="display:none;">
+                                  <input type="hidden" name="comment-id" value="{{ com.id }}"> 
+                                  <input type="text" name="reply-text" placeholder="Введіть відповідь на коментарь">
+                                  <button type="submit">Відповісти</button>
+                                </div>
+    
+                              </form>
+                              <br>
+                              
+                              <!-- Replys --> 
+                              <div id="block-replys">
+                                {% for reply in replys_comments %}
                                     {% if reply.id_main_comment == com.id %}
-                                      <div class="media mt-4">
-                                        <img class="d-flex mr-3 rounded-circle" src="http://plac  ehold.it/50x50" alt="">
-                                        {% for i in author_comment %}
-                                          {% if i.id == reply.id_author_reply %}
+                                      
+                                      <ul class="media-list">                                     
+                                            <img class="media-object img-circle" style="max-width: 5%" src="/{{ reply.avatar_author_reply }}" alt="profile">
                                         
-                                            <h5 class="mt-0">{{ i.login }}</h5>
-                                            {{ reply.text }}
-                                          {% endif %}
-                                        
-                                        {% endfor %}
-                                      </div>
-                                    {% endif %}
-                                  {% endfor %}
+                                            <div class="well well-lg" style="max-width: 770px">
+                                                <h4 class="media-heading text-uppercase reviews"> {{reply.login_author_reply}} </h4>
+                                                
+                                                <ul class="media-date text-uppercase reviews list-inline">
+                                       
+                                                  <li class="dd">{{reply.date}}</li>
+                                                </ul>
+                                                <p class="media-comment">
+                                                  {{ reply.text }}
+                                                </p>
+                                      
+
+                                                {% if user.id == reply.id_author_reply %}
+                                                  <form method="POST">
+                                                    <input type="hidden" name="del-id-my-comment" value="{{ reply.id }}">
+                                                    <button class="btn btn-danger btn-circle text-uppercase" type="submit"><span class="glyphicon glyphicon-trash"></span> Видалити</button>
+                                                  </form>
+                  
+                                                  <br>
+                                                  <button type="submit"  class="btn btn-success btn-circle text-uppercase" onclick="showWindowEditReply('{{ reply.id }}')"> <span class="glyphicon glyphicon-pencil"></span> Редагувати</button>
+                  
+                                                  <!-- Window form  -->
+                                                  <div id="WindowEdit" class="modal">
+                                                    <div class="modal-content">
+                                                        <span class="close" onclick="hideWindowEdit()">&times;</span>
+                                                      
+                                                        <form method="POST" onsubmit="submitForm(event)">
+                                                            <input type="hidden" name="id-reply-edit" id="id-reply-edit" value="{{ reply.id }}" required>
+                                                            <input type="text" name="text_edit" id="text_edit" required>
+                                                            <button type="submit">Готово</button>
+                                                        </form>
+                  
+                                                    </div>
+                                                    </div>
+                  
+                                               
+                                              {% endif %}
+                                                <a class="btn btn-warning btn-circle text-uppercase" data-toggle="collapse" href="#replyOne"><span class="bi bi-hand-thumbs-up-fill"></span></a>
+                                                <button class="btn btn-info btn-circle text-uppercase" type="submit" onclick="replyBtn( '{{ author.id }}' )">Відповісти</button>
+                          
+                                                <form method="POST">
+                                                  <div id="reply-container-{{ author.id }}" style="display:none;">
+                                                    <input type="hidden" name="comment-id" value="{{ com.id }}"> 
+                                                    <input type="text" name="reply-text" placeholder="Введіть відповідь на коментарь">
+                                                    <button type="submit">Відповісти</button>
+                                                  </div>
+                      
+                                                </form>
+
+                                              </div>  
+                                              {% endif %}
+                               
+                                {% endfor %}
                             </div>
+                           
+                              
+                              <script>
+                                // show field reply
+                                function replyBtn(authorId) {
+                                  var replyContainer = document.getElementById("reply-container-" + authorId);
+                                  if (replyContainer.style.display === "none") {
+                                    replyContainer.style.display = "block";
+                                  } else {
+                                    replyContainer.style.display = "none";
+                                  }
+                                }        
+                                
+
+                                // show block replys
+                                function ShowReplys(id_main_comment) {
+                                  var replysBlock = document.getElementById("block-replys-" + id_main_comment);
+                                  if (replysBlock.style.display === "none") {
+                                    replysBlock.style.display = "block";
+                                  } else {
+                                    replysBlock.style.display = "none";
+                                  }
+                                }      
+
+
+                                // window edit comment
+                                function showWindowEdiоt(userId) {
+                                  var window = document.getElementById("WindowEdit");
+                                  var text_edit = document.getElementById("text_edit");
+                                  text_edit.value = userId;
+                                  window.style.display = "block";
+                                }
+
+                                function hideWindowEdit() {
+                                    var window = document.getElementById("WindowEdit");
+                                    window.style.display = "none";
+                                }
+
+
+                                function showWindowEditReply(userId) {
+                                  var window = document.getElementById("WindowEdit");
+                                  var text_edit = document.getElementById("text_edit");
+                                  text_edit.value = userId;
+                                  window.style.display = "block";
+                                }
+
+                                function hideWindowEdit() {
+                                    var window = document.getElementById("WindowEdit");
+                                    window.style.display = "none";
+                                }                                        
+                              </script>
+                          </div>                          
                         </div>
-                    {% endif %}
+                      </li> 
                 {% endfor %}
-              {% endfor %}
-        
+              {% endfor %}   
     </div> <!-- /container -->
     </section>
 
-
     <section class="footer-link"><h2>Contacts</h2></section>
     {% endfor %}
-
 {% endblock %}

@@ -23,9 +23,10 @@ def post(title, id):
     session_id_author = session.get('id')
 
     posts = db.session.query(Posts).filter_by(id=id).all()  
-    all_news = db.session.query(Posts).filter_by(type='news').all()
+    all_posts = db.session.query(Posts).filter_by(type='news').all()
     comments_for_post = db.session.query(Comments).filter_by(id_post=id).all()
     replys_comments = db.session.query(ReplyComment).all()
+    user = db.session.query(Accounts_Users).filter_by(id=session_id_author)
 
 
     if not posts:
@@ -79,29 +80,49 @@ def post(title, id):
             return response
 
 
-        #FIXME: display inverce comments and avatar
-        #FIXME: Added replays for replays
-        #TODO: buttons for comment, delete, edit, other
         # Reply comment
         if 'reply-text' in request.form:
             # interact other comment
             reply_comment = request.form['reply-text']
             id_main_comment = request.form['comment-id']
             
-            save_replyComment = ReplyComment(text=reply_comment, id_main_comment=id_main_comment, id_author_reply=session_id_author)
+            save_replyComment = ReplyComment(text=reply_comment, id_main_comment=id_main_comment, id_author_reply=session_id_author, login_author_reply=user.login, avatar_author_reply=user.img_avatar)
             db.session.add(save_replyComment)
             db.session.commit()
+            
+            return response
+
+
+        # edit my comment
+        # delete 
+        if 'del-id-my-comment' in request.form:
+            del_id_my_comment = request.form['del-id-my-comment']
+
+            db.session.query(Comments).filter_by(id=del_id_my_comment).delete()
+            db.session.commit()
             db.session.close()
+            
+            return response
+
+        
+        # edit text
+        if 'id-com-edit' in request.form:
+            id_com_edit = request.form['id-com-edit']
+            text_edit = request.form['text_edit']
+
+            db.session.query(Comments).filter_by(id=id_com_edit).update({'text': text_edit})
+            db.session.commit()
 
 
     author_comment = db.session.query(Accounts_Users).all()     
     
     context = {
         'posts': posts,
-        'all_news': all_news,
+        'all_posts': all_posts,
         'comments_for_post': comments_for_post,
         'author_comment': author_comment,
         'replys_comments': replys_comments,
+        'user': user
     }
 
 

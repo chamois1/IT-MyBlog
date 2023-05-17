@@ -119,22 +119,43 @@ def history_comments(id_user, account):
     return render_template('history_comments.html', account=account, comments=comments)        
 
 
-#TODO: buttons delete save post, and like
-#TODO: Показувати у пості скільки лайків, зберегло, коментарів (число)
-
 # save posts
-@profiles.route('/my-profile/save-posts')
+@profiles.route('/my-profile/save-posts', methods=['POST', 'GET'])
 @auth_user
 def save_posts(id_user, account):
     save_posts = db.session.query(Posts).filter(Posts.id.in_(account.save_posts)).all()
+
+    if 'delete-save-post' in request.form:
+        delete_save_post = request.form['delete-save-post']
+
+        list_save = account.save_posts
+        list_save.remove(int(delete_save_post))
+        
+        db.session.query(Accounts_Users).filter_by(id=id_user).update({'save_posts': list_save})
+        db.session.commit()
+
+        return redirect('./save-posts')
+    
 
     return render_template('save_posts.html', account=account, save_posts=save_posts)
 
 
 # like posts
-@profiles.route('/my-profile/like-posts')
+@profiles.route('/my-profile/like-posts', methods=['POST', 'GET'])
 @auth_user
 def like_post(id_user, account):
     like_posts = db.session.query(Posts).filter(Posts.id.in_(account.like_posts)).all()
+
+    if 'delete-like-post' in request.form:
+        delete_like_post = request.form['delete-like-post']
+
+        list_like = account.like_posts
+        list_like.remove(int(delete_like_post))
+
+        db.session.query(Accounts_Users).filter_by(id=id_user).update({'like_posts': list_like})
+        db.session.commit()
+
+        return redirect('./like-posts')
+        
 
     return render_template('like_post.html', account=account, like_posts=like_posts)

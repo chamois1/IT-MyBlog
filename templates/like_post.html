@@ -19,6 +19,12 @@
                     <hr>
                     <p class="lead">{{ post.title }}</p>
                     <a class="btn btn-outline-dark my-2" href="/post/{{ post.title }}/{{ post.id }}" role="button">Читати більше</a>
+
+                    <form method="POST">
+                        <input type="hidden" name="delete-like-post" value="{{ post.id }}">
+                        <button type="submit">Видалити</button>
+                    </form>
+
                 </div>
             </div>
         </div>
