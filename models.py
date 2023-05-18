@@ -40,6 +40,8 @@ class Posts(db.Model):
     image = Column("image", String, nullable=True, default='/images/posts/default_post.jpeg')
     type = Column('type', String)
 
+    history_view = Column('history_view', Integer, default=0)
+
     # connections of models
     comments = db.relationship('Comments', backref='post', lazy=True)
 
@@ -54,6 +56,9 @@ class Comments(db.Model):
     id_post = Column('id_post', Integer, ForeignKey('posts.id'))
     title_post = Column('title_post', String)
     id_author = Column('id_author', Integer)
+
+    # save the user id in the favorites list to check if he clicked
+    likes = Column('likes', JSON, default=[])
 
 
 # Reply comment for main comment

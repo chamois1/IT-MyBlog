@@ -7,6 +7,7 @@ from flask_bcrypt import Bcrypt, check_password_hash
 from flask_ckeditor import CKEditor
 from flask_paginate import Pagination, get_page_args
 from sqlalchemy import or_ 
+from flask_migrate import Migrate
 
 from db import db_init, db
 from models import Accounts_Users, Posts
@@ -37,6 +38,16 @@ app.config['UPLOAD_FOLDER'] = 'static/images/'
 db_init(app)
 Session(app)
 
+"""
+Added for convenience when working with models
+0. Create new column in models
+1. flask db init
+2. flask db migrate -m "Initial Migration"
+3. flask db upgrade
+Done! Model upgraded.
+"""
+migrate = Migrate(app, db)  
+
 
 # function will pass variables for all html
 @app.context_processor
@@ -66,7 +77,7 @@ def result_posts(search):
 
     # search context word
     # Apply pagination, and create object paginations
-    query  = Posts.query.filter(or_(Posts.title.like(f'%{search}%'), Posts.description.like(f'%{search}%')))
+    query  = Posts.query.filter(or_(Posts.title.like(f'%{search}%'), Posts.description.like(f'%{search}%'), Posts.tag.like(f'%{search}%')))
     result_search = query.offset(offset).limit(per_page).all()    
 
     pagination = Pagination(page=page, per_page=per_page, total=Posts.query.count(), css_framework='bootstrap4')
@@ -124,10 +135,10 @@ def sign_up():
 @app.route('/sign-in', methods=['POST', 'GET'])
 def sign_in():    
     if request.method == "POST":
+       
        # form       
        email = request.form["email"]
        password = request.form["password"].encode('utf-8') 
-
     
        search_account = db.session.query(Accounts_Users).filter_by(email=email).first()
        if not search_account:

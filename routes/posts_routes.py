@@ -31,16 +31,26 @@ def post(title, id):
     response = redirect(f'/post/{title}/{id}')
     session_id_author = session.get('id')
 
-    posts = db.session.query(Posts).filter_by(id=id).all()  
-    all_posts = db.session.query(Posts).filter_by(type='news').all()
+    # info for post
+    post = db.session.query(Posts).filter_by(id=id)
+    post_likes = db.session.query(Accounts_Users).filter(Accounts_Users.like_posts.like('%{}%'.format(id))).all()
+    post_saves = db.session.query(Accounts_Users).filter(Accounts_Users.save_posts.like('%{}%'.format(id))).all()
+
     comments_for_post = db.session.query(Comments).filter_by(id_post=id).all()
     replys_comments = db.session.query(ReplyComment).all()
+
+    all_posts = db.session.query(Posts).all()
     user = db.session.query(Accounts_Users).filter_by(id=session_id_author)
 
-
-    if not posts:
+    if not post:
         return render_template('not_found_post.html')
     
+    # save view
+    history_view = post.first().history_view 
+    history_view += 1
+    
+    post.update({'history_view': history_view})
+    db.session.commit()
 
     if session_id_author:
         # save id post in history
@@ -75,7 +85,7 @@ def post(title, id):
                 db.session.commit()
 
 
-        # Comment
+        # Comments
         if 'text_comment' in request.form:
             # create comment
             text_comment = request.form['text_comment']
@@ -88,7 +98,7 @@ def post(title, id):
 
             return response
 
-
+        # buttons for comments
         # Reply comment
         if 'reply-text' in request.form:
             # interact other comment
@@ -100,6 +110,21 @@ def post(title, id):
             db.session.commit()
             
             return response
+
+
+        if 'like-comment' in request.form:
+            like_comment = request.form['like-comment']
+
+            # save like in list
+            comment_like = db.session.query(Comments).filter_by(id=like_comment).first()
+
+            if not session_id_author in comment_like.likes:
+                comment_like.likes.append(session_id_author)
+
+                db.session.query(Comments).filter_by(id=like_comment).update({'likes': comment_like.likes})
+                db.session.commit()
+
+                return response
 
 
         # edit my comment
@@ -123,13 +148,26 @@ def post(title, id):
             db.session.commit()
 
 
+        # admin buttons
+        if 'delete-comment-user' in request.form:
+            delete_comment_user = request.form['delete-comment-user']
+
+            db.session.query(Comments).filter_by(id=delete_comment_user).delete()
+            db.session.commit()
+
+            return response
+
+
     author_comment = db.session.query(Accounts_Users).all()     
     
 
     context = {
-        'posts': posts,
+        'post': post.first(),
         'all_posts': all_posts,
         'comments_for_post': comments_for_post,
+        'post_likes': post_likes,
+        'post_saves': post_saves,
+
         'author_comment': author_comment,
         'replys_comments': replys_comments,
         'user': user
