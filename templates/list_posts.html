@@ -5,6 +5,38 @@
 {% block content %}
     <h1>Список постів</h1>
 
+    <h2 style="text-align: right;">Сортіровка</h2>
+
+    <div style="float: right;">
+        <form method="POST">
+            <input type="hidden" name="sort-date">
+            <button type="submit">По даті</button>
+        </form>
+
+        <br>
+
+        <form method="POST">
+            <input type="hidden" name="sort-type">
+
+            <select name="type">
+                <option value="news">news</option>
+                <option value="resources">resources</option>
+            </select>
+            <br><br>
+            <button type="submit">Підтвердити тип</button>            
+        </form>
+
+        <hr>
+
+        <form method="POST">
+            <input type="text" name="search" placeholder="Шукати по заголовку">
+            <button type="submit">Шукати</button>
+        </form>
+
+    </div>
+    
+    <br><br><br>
+
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -18,25 +50,36 @@
                         <th>Видалити</th>
                         <th>Редагувати</th>
                     </thead>
-                    
-                    {% for post in posts %}
-
-                        <td><img src="/{{ post.image }}" style="max-width: 10%; max-height: 10%;" class="card-img-top" alt="image post"></td>
-                        <td>{{post.date}}</td>
-                        <td><a href="/post/{{ post.title }}/{{ post.id }}">{{ post.title }}</a></td>
                 
-                        <td>{{post.type}}</td>
-                        
-                        <form method="POST">
-                            <input type="hidden" name="post-delete" value="{{ post.id }}">
-                            <td><button class="btn btn-danger btn-xs" ><span class="glyphicon glyphicon-trash"></span></button></td>
-                        </form>
-                        
-                        <td><a href="/admin/list-posts/editor-post/{{ post.title }}/{{ post.id }}"><button class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></span></button></td></a>
-                        
-                        <tr>
-                    {% endfor %}
+                
+                {% if request.method == 'POST' and 'sort-date' in request.form %}
+                    {% set sort_type = sorted_date %}
+                {% elif request.method == 'POST' and 'type' in request.form %}
+                    {% set sort_type = sorted_types %}
+                {% elif request.method == 'POST' and 'search' in request.form %}
+                    {% set sort_type = search_title %}
+                {% else %}
+                    {% set sort_type = posts %}    
+                {% endif %}
+
+                {% for post in sort_type  %}
+                    <td><img src="/{{ post.image }}" style="max-width: 10%; max-height: 10%;" class="card-img-top" alt="image post"></td>
+                    <td>{{post.date}}</td>
+                    <td><a href="/post/{{ post.title }}/{{ post.id }}">{{ post.title }}</a></td>
+            
+                    <td>{{post.type}}</td>
+                    
+                    <form method="POST">
+                        <input type="hidden" name="post-delete" value="{{ post.id }}">
+                        <td><button class="btn btn-danger btn-xs" ><span class="glyphicon glyphicon-trash"></span></button></td>
+                    </form>
+                    
+                    <td><a href="/admin/list-posts/editor-post/{{ post.title }}/{{ post.id }}"><button class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></span></button></td></a>
+                    
+                    <tr>
+                {% endfor %}
                 </table>
+
 
 <div class="container">
     {{ pagination.links }}

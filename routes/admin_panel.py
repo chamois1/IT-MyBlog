@@ -4,6 +4,7 @@ from functools import wraps
 
 from flask import Blueprint, render_template, session, redirect, request, current_app
 from flask_paginate import Pagination, get_page_args
+from sqlalchemy import desc
 
 from models import Posts, Accounts_Users
 from db import db
@@ -91,7 +92,30 @@ def list_posts():
         return redirect('./list-posts')
     
 
-    return render_template('list_posts.html', posts=posts, pagination=pagination)
+    # sorting   
+    sorted_date = Posts.query.order_by(desc(Posts.date)).offset(offset).limit(per_page).all()
+
+    sorted_types = None
+    search_title = None
+    if 'type' in request.form:
+        type = request.form['type']
+        sorted_types = Posts.query.filter_by(type=type).paginate(page=page, per_page=per_page).items
+
+
+    if 'search' in request.form:
+        search = request.form['search']
+        search_title = Posts.query.filter_by(title=search).paginate(page=page, per_page=per_page).items
+
+
+    context = {
+        'posts': posts, 
+        'pagination': pagination,
+
+        'sorted_date': sorted_date, 
+        'sorted_types': sorted_types,                
+        'search_title': search_title
+    }
+    return render_template('list_posts.html', **context)
 
 
 # edit post
@@ -138,7 +162,7 @@ def editor_posts(title, id):
         db.session.commit()
         return redirect('/admin/list-posts')
 
-
+ 
     return render_template('editor_post.html', edit_post=edit_post)
 
 
