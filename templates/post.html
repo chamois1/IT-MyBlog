@@ -3,51 +3,14 @@
   {% block title %} Post {{ post.title }} {% endblock %}
 
   {% block link %}
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='styles/post.css') }}">
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   {% endblock %}
 
   {% block body %}
-  <style>
-      .post-title-block{padding:100px 0;}
-      .footer-link{float:left; width:100%; background:#222222; text-align:center; padding:30px;}
 
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-      }
-      
-      .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 400px;
-      }
-      
-      .close {
-        color: #888;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-      
-      .close:hover {
-        color: #000;
-      }
-  </style>
-
-  
   <section class="post-content-section">
     <img style="max-width: 30%; position:absolute;" src="/{{ post.image }}"  alt="image post">
     <div class="container">
@@ -59,14 +22,13 @@
             <h4>{{ post.date }}</h4>
             <h1>{{ post.title }}</h1>
             <h2 class="lead">{{ post.description|safe }}</h2>
-
-        <i class="material-icons">remove_red_eye</i> {{post.history_view}}
+            <i class="material-icons">remove_red_eye</i> {{post.history_view}}
         <h1></h1>
         
         <!-- Buttons -->
         <form method="POST">
           <input type="hidden" name="save_post">
-          <button type="submit" class="btn btn-primary">Зберегти<i class="bi bi-save"></i> {{post_saves|length}}</button>
+          <button type="submit" class="btn btn-primary">Зберегти <i class="bi bi-save"></i> {{post_saves|length}}</button>
         </form>
         <br>
 
@@ -74,8 +36,26 @@
           <input type="hidden" name="like_post">
           <button type="submit" class="btn btn-primary"><i class="bi bi-hand-thumbs-up-fill"> {{post_likes|length}}</i></button>
         </form>
-  
-          
+        <br>
+        
+        <!-- Edit Post -->
+        <button class="btn btn-primary" id="editPost"><i class="bi bi-pencil" onclick="EditPost()"></i> Редагувати Пост</button>
+
+        <div id="modalEdit" class="modalPostEdit">
+          <div class="modal-content-edit-post">
+            <span class="close">&times;</span>
+            <h2>Внести правки в пост</h2>
+
+            <form method="POST"> 
+              <textarea name="textEditsPosts"></textarea>
+              <br><br>
+
+              <button type="submit">Відправити запит</button>
+            </form>
+          </div>
+        </div>
+
+
         <!-- Comments -->
         <div class="card my-4">
           <h5 class="card-header">Прокоментуйте пост | прокоментовало {{post.comments|length}}</h5>
@@ -241,56 +221,6 @@
                                           {% endif %}
                             {% endfor %}
                         </div>
-                    
-                          <script>
-                            // show field reply
-                            function replyBtn(authorId) {
-                              var replyContainer = document.getElementById("reply-container-" + authorId);
-                              if (replyContainer.style.display === "none") {
-                                replyContainer.style.display = "block";
-                              } else {
-                                replyContainer.style.display = "none";
-                              }
-                            }        
-                            
-
-                            // show block replys
-                            function ShowReplys(id_main_comment) {
-                              var replysBlock = document.getElementById("block-replys-" + id_main_comment);
-                              if (replysBlock.style.display === "none") {
-                                replysBlock.style.display = "block";
-                              } else {
-                                replysBlock.style.display = "none";
-                              }
-                            }      
-
-
-                            // window edit comment
-                            function showWindowEdiоt(userId) {
-                              var window = document.getElementById("WindowEdit");
-                              var text_edit = document.getElementById("text_edit");
-                              text_edit.value = userId;
-                              window.style.display = "block";
-                            }
-
-                            function hideWindowEdit() {
-                                var window = document.getElementById("WindowEdit");
-                                window.style.display = "none";
-                            }
-
-
-                            function showWindowEditReply(userId) {
-                              var window = document.getElementById("WindowEdit");
-                              var text_edit = document.getElementById("text_edit");
-                              text_edit.value = userId;
-                              window.style.display = "block";
-                            }
-
-                            function hideWindowEdit() {
-                                var window = document.getElementById("WindowEdit");
-                                window.style.display = "none";
-                            }                                        
-                          </script>
                       </div>                          
                     </div>
                   </li> 
@@ -299,4 +229,5 @@
           {% endfor %}
       </div> <!-- /container -->
   </section>
+<script src="{{ url_for('static', filename='js/post.js') }}"></script>
 {% endblock %}

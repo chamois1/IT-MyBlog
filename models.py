@@ -73,3 +73,17 @@ class ReplyComment(db.Model):
     id_author_reply = Column('id_author_reply', Integer)
     login_author_reply = Column('login_author_reply', String)
     avatar_author_reply = Column('avatar_author_reply', String)
+
+
+# Edits to the post
+class listRequestEdit(db.Model):
+    __tablename__ = "listRequestPost"
+
+    id = Column('id', Integer, primary_key=True)
+    date = Column(DateTime, default=datetime.utcnow)
+    text = Column('text', Text)
+
+    id_post = Column('id_post', Integer)
+    title_post = Column('title_post', String)
+
+    id_author = Column('id_author', Integer)

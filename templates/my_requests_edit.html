@@ -1,0 +1,107 @@
+{% extends 'my_profile.html' %}
+
+{% block title %} Мої запити на правку постів {% endblock %}
+
+{% block content %}
+    <style>
+        .modalPostEdit {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5); 
+          }
+          
+          .modal-content-edit-post {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+          }
+    </style>
+
+    <h1>Мої запити на правку постів</h1>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+            <div class="table-responsive">
+                <table id="mytable" class="table table-bordred table-striped">
+                    <thead>
+                        <th>Дата</th>
+                        <th>Пост</th>
+                        <th>Текст</th>
+                        <th>Видалити</th>
+                        <th>Редагувати</th>
+                    </thead>
+    
+                    
+        {% for request in listRequests_posts %}
+            <td>{{request.date}}</td>
+            <td><a href="/post/{{ request.title_post }}/{{ request.id_post }}">{{ request.title_post }}</a></td>
+
+            <td>{{request.text}}</td>
+            <form method="POST">
+                <input type="hidden" name="request-delete" value="{{ request.id }}">
+                <td><p data-placement="top" data-toggle="tooltip" title="Delete"><button class="btn btn-danger btn-xs" data-title="Delete" data-toggle="modal" data-target="#delete" ><span class="glyphicon glyphicon-trash"></span></button></p></td>
+            </form>
+
+        
+            <!-- Edit Post -->
+            <td><button class="btn btn-primary" id="editPost"><i class="bi bi-pencil" onclick="EditPost()"></i></button> </td> 
+
+
+            <div id="modalEdit" class="modalPostEdit">
+                <div class="modal-content-edit-post">
+                  <span class="close">&times;</span>
+                  <h2>Редагувати</h2>
+      
+                  <form method="POST"> 
+                    <input type="hidden" name="id-request" value="{{ request.id }}">
+                    <textarea name="textEditsPosts">{{request.text}}</textarea>
+                    <br><br>
+      
+                    <button type="submit">Відправити запит</button>
+                  </form>
+                </div>
+              </div>
+
+            </tr>  
+        {% endfor %}
+    </table>
+
+<script>
+    // modal window for edit post
+    var openModalBtn = document.getElementById("editPost");
+    var modal = document.getElementById("modalEdit");
+    var closeBtn = document.getElementsByClassName("close")[0];
+
+    openModalBtn.onclick = function() {
+    modal.style.display = "block";
+    };
+
+    closeBtn.onclick = function() {
+    modal.style.display = "none";
+    };
+
+
+    window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+    };
+</script>
+
+
+<div class="container">
+    {{ pagination.links }}
+</div>
+    
+
+{% endblock %}

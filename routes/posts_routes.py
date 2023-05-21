@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, request
 from flask_paginate import Pagination, get_page_args
 
-from models import Posts, Comments, Accounts_Users, ReplyComment
+from models import Posts, Comments, Accounts_Users, ReplyComment, listRequestEdit
 from db import db
 
 # This file, for urls /post/resources, or /post/news other
@@ -84,6 +84,19 @@ def post(title, id):
                 db.session.query(Accounts_Users).filter_by(id=session_id_author).update({'like_posts': like_post})
                 db.session.commit()
 
+    
+        if 'textEditsPosts' in request.form:
+            # What should be changed in the post
+            # The user sends a request to change it
+            
+            textEditsPosts = request.form['textEditsPosts']
+            
+            saveList_EditPost = listRequestEdit(text=textEditsPosts, title_post=title, id_post=id, id_author=session_id_author)
+            db.session.add(saveList_EditPost)
+            db.session.commit()
+
+            return response
+           
 
         # Comments
         if 'text_comment' in request.form:
@@ -94,9 +107,9 @@ def post(title, id):
             save_comment = Comments(text=text_comment, title_post=title, id_post=id, id_author=session_id_author)
             db.session.add(save_comment)
             db.session.commit()    
-        
 
             return response
+
 
         # buttons for comments
         # Reply comment

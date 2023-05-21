@@ -1,7 +1,7 @@
 import pytest
 
 from app import app
-from models import Accounts_Users, Posts
+from models import Accounts_Users, Posts, listRequestEdit
 from db import db
 
 """
@@ -26,6 +26,7 @@ Using 'parametrize' will not constantly create a function, thereby shortening th
     ('/my-profile/history-comments', 'Історія моїх коментарів'),
     ('/my-profile/save-posts', 'Збережені пости'),
     ('/my-profile/like-posts', 'Вподобані пости'),
+    ('/my-profile/request-post-edits', 'Мої запити на правку постів'),
     
     # admin panel
     ('/admin/add-post', 'Добавити пост'),
@@ -34,6 +35,8 @@ Using 'parametrize' will not constantly create a function, thereby shortening th
     ('/admin/list-posts/editor-post/testTitle/1', 'Редагувати пост'),
     ('/admin/list-users', 'Список користувачів'),
     ('/admin/list-users', '<td>testUser</td>'), # display user
+    ('/admin/list-request-edit', 'Список запитів на редагування поста'),
+    ('/admin/list-request-edit', '<td>testText</td>'), # display request
 
     # posts
     ('/news', 'news'),
@@ -51,10 +54,12 @@ def test_page_content(path, expected_text):
                 test_userAdmin = Accounts_Users(login='testUserAdmin', email='testUserAdmin@gmail.com', password='test123Admin', is_admin=True)
                 test_user = Accounts_Users(login='testUser', email='test@gmail.com', password='test123')
                 test_post = Posts(title='testTitle', description='testDescription', tag='#testTag #testTag', type='news')
+                test_request = listRequestEdit(text='testText', id_post=1, title_post='testTitle', id_author=1)
 
                 db.session.add(test_userAdmin)
                 db.session.add(test_user)
                 db.session.add(test_post)
+                db.session.add(test_request)
 
                 db.session.commit()
 

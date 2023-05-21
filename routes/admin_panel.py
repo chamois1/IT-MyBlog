@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, session, redirect, request, curren
 from flask_paginate import Pagination, get_page_args
 from sqlalchemy import desc
 
-from models import Posts, Accounts_Users
+from models import Posts, Accounts_Users, listRequestEdit
 from db import db
 
 
@@ -206,3 +206,25 @@ def list_users():
 
 
     return render_template('list_users.html', users=users, pagination=pagination)
+
+
+# list request edit
+@admin_bp.route('/list-request-edit', methods=['POST', 'GET'])
+@is_admin
+def list_Request():
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # Apply pagination, and create object paginations
+    requests = listRequestEdit.query.offset(offset).limit(per_page).all()
+    pagination = Pagination(page=page, per_page=per_page, total=listRequestEdit.query.count(), css_framework='bootstrap4')
+
+    if request.method == 'POST':
+        delete_request = request.form['request-delete']
+        
+        db.session.query(listRequestEdit).filter_by(id=delete_request).delete()
+        db.session.commit()
+          
+        return redirect('/admin/list-request-edit')
+
+    return render_template('list_requestsUsers.html', requests=requests, pagination=pagination)

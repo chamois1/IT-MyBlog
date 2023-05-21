@@ -1,5 +1,5 @@
 import pytest
-from models import Accounts_Users, Posts, Comments, ReplyComment
+from models import Accounts_Users, Posts, Comments, ReplyComment, listRequestEdit
 
 """ 
 Testing whether data is added to the model  
@@ -24,7 +24,11 @@ After set up models, example: Accounts_Users, first argument - input data, secon
 
     (ReplyComment(), {'text': 'testText', 'id_main_comment': 1, 'id_author_reply': 1, 'login_author_reply': 'testLogin'},
                      {'text': 'testText', 'id_main_comment': 1, 'id_author_reply': 1, 'login_author_reply': 'testLogin'}
-    )
+    ),
+
+    (listRequestEdit(), {'text': 'testText', 'id_post': 1, 'title_post': 'testTitle', 'id_author': 1}, 
+                        {'text': 'testText', 'id_post': 1, 'title_post': 'testTitle', 'id_author': 1}, 
+    ),
 ])
 
 

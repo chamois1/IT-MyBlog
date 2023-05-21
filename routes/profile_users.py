@@ -7,7 +7,7 @@ from flask_paginate import Pagination, get_page_args
 from flask_bcrypt import Bcrypt, check_password_hash
 
 from db import db
-from models import Accounts_Users, Posts, Comments
+from models import Accounts_Users, Posts, Comments, listRequestEdit
 
 # This file, for urls /my-profile/settings, or other
 profiles = Blueprint('my-profile', __name__)
@@ -178,3 +178,41 @@ def like_post(id_user, account):
         
 
     return render_template('like_post.html', account=account, like_posts=like_posts, pagination=pagination)
+
+
+@profiles.route('/my-profile/request-post-edits', methods=['POST', 'GET'])
+@auth_user
+def requestPostEdits(id_user, account):
+    response = redirect ('./request-post-edits')
+
+    # page arguments
+    page, per_page, offset = get_page_args()
+
+    # Apply pagination, and create object paginations
+    query  = listRequestEdit.query.filter_by(id_author=id_user)
+    listRequests_posts = query.offset(offset).limit(per_page).all()    
+    pagination = Pagination(page=page, per_page=per_page, total=listRequestEdit.query.count(), css_framework='bootstrap4')
+
+
+    # button delete request
+    if 'request-delete' in request.form:
+        delete_request = request.form['request-delete']
+        
+        db.session.query(listRequestEdit).filter_by(id=delete_request).delete()
+        db.session.commit()
+          
+        return response
+    
+
+    # edit 
+    if 'textEditsPosts' in request.form:
+        id_request = request.form['id-request']
+        textEditsPosts = request.form['textEditsPosts']
+        
+        db.session.query(listRequestEdit).filter_by(id=id_request).update({'text': textEditsPosts})
+        db.session.commit()
+
+        return response
+
+
+    return render_template('my_requests_edit.html', account=account, listRequests_posts=listRequests_posts, pagination=pagination)

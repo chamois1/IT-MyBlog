@@ -1,0 +1,42 @@
+{% extends 'admin_panel.html' %}
+
+{% block title %} Список користувачів {% endblock %}
+
+{% block content %}
+
+<h1>Список запитів на редагування поста</h1>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+        <div class="table-responsive">
+            <table id="mytable" class="table table-bordred table-striped">
+                <thead>
+                    <th>id</th>
+                    <th>Дата</th>
+                    <th>Текст</th>
+                    <th>Пост</th>      
+                    <th>Видалити</th>      
+                </thead>
+                
+                {% for request in requests %}
+
+                    <td>{{request.id }}</td>
+                    <td>{{request.date}}</td>
+                    <td>{{request.text}}</td>
+                    <td><a href="/post/{{ request.title_post }}/{{ request.id_post }}">{{ request.title_post }}</a></td>
+                 
+                    <form method="POST">
+                        <input type="hidden" name="request-delete" value="{{ request.id }}">
+                        <td><button class="btn btn-danger btn-xs" ><span class="glyphicon glyphicon-trash"></span></button></td>
+                    </form>
+
+                {% endfor %}
+            </table>
+
+<div class="container">
+    {{ pagination.links }}
+</div>
+
+{% endblock %}
