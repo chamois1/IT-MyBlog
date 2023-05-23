@@ -6,6 +6,8 @@ from flask import Blueprint, render_template, session, redirect, request, curren
 from flask_paginate import Pagination, get_page_args
 from sqlalchemy import desc
 
+from datetime import datetime
+
 from models import Posts, Accounts_Users, listRequestEdit
 from db import db
 
@@ -40,6 +42,7 @@ def add_post():
         tag = request.form['tags']
         image = request.files['image-post']
         type = request.form['type']
+        date_publish = request.form['date-publish']
 
         if image:
             # Generate a unique image using UUID and save the avatar
@@ -59,7 +62,7 @@ def add_post():
             edit_tags += f'#{i} '
 
 
-        save_data = Posts(title=title, description=description, tag=edit_tags, image=image_path, type=type)
+        save_data = Posts(date=datetime.fromisoformat(date_publish), title=title, description=description, tag=edit_tags, image=image_path, type=type)
         db.session.add(save_data)
         db.session.commit()
 
@@ -130,7 +133,7 @@ def editor_posts(title, id):
         tag = request.form['tags']
         image = request.files['image-post']
         type = request.form['type']
-
+        date_publish = request.form['date-publish']
 
         if image:
             # Generate a unique image using UUID and save the avatar
@@ -155,7 +158,8 @@ def editor_posts(title, id):
                 'description': description,
                 'tag': edit_tags,
                 'image': image_path,
-                'type': type
+                'type': type,
+                'date': datetime.fromisoformat(date_publish)
             }   
         )
 

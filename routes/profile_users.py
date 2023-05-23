@@ -22,7 +22,7 @@ def auth_user(f):
 
         # checking sesion
         if 'id' not in session:
-            return redirect(url_for('sign_in'))
+            return redirect('sign-in')
         return f(id_user, account, *args, **kwargs)
     
     return decorated_if_session

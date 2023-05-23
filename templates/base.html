@@ -17,18 +17,20 @@
             <ul class="navbar-nav mr-auto">
                 <a href="/news" class="nav-item active nav-link">Новини</a>
                 <a href="/resources" class="nav-item active nav-link">Ресурси</a>
-                <a href="/contacts" class="nav-item active nav-link">Контакти</a>
-
+                <a href="/contact" class="nav-item active nav-link">Контакти</a>
+                <a href="/statistics" style="margin-right: 600px;" class="nav-item active nav-link">Статистика сайту</a>
+                
+                
                 {% if session_is_admin == True %}
                     <a href="/admin" class="nav-item active nav-link">Адмін панель</a>
                 {% endif %}
-
+                
                 {% if not id_session %}
                     <a href="/sign-up" class="nav-item active nav-link">Зарегеструватися</a>
                 {% else %}
                     <a href="/my-profile" class="nav-item active nav-link">Мій профіль</a>
                 {% endif %}
-                
+            
             </ul>
 
             <form action="/" method="post" class="form-inline my-2 mylg-0">

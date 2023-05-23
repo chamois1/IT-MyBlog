@@ -33,7 +33,7 @@ class Posts(db.Model):
     __tablename__ = "posts"   
 
     id = Column("id", Integer, primary_key=True)
-    date = Column(DateTime, default=datetime.utcnow)
+    date = Column('date', DateTime)
     title = Column('title', String)
     description = Column("description", Text)
     tag = Column("tag", String)

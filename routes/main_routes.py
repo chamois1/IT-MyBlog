@@ -6,9 +6,10 @@ from flask import render_template, request, redirect, flash, session, current_ap
 from flask_bcrypt import Bcrypt, check_password_hash
 from flask_paginate import Pagination, get_page_args
 from sqlalchemy import or_ 
+import smtplib
 
 from db import db
-from models import Accounts_Users, Posts
+from models import Accounts_Users, Posts, Comments
 
 """ Main routes, authrization, nav bar, other """
 
@@ -40,6 +41,45 @@ def result_posts(search):
     pagination = Pagination(page=page, per_page=per_page, total=Posts.query.count(), css_framework='bootstrap4')
 
     return render_template('result_search.html', search=search, result_search=result_search, pagination=pagination)
+
+
+# contact form
+@main_routes.route('/contact', methods=['POST', 'GET'])
+def contact():
+    if request.method == 'POST':
+        """ Get form data user. Data user send on email """
+
+        name = request.form['name']
+        surname = request.form['surname']
+        email = request.form['email']
+        phone = request.form['phone']
+        message = request.form['message']
+         
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+
+        # email to which the message will be sent
+        """ 
+        You can configure the environment change to not show the password in code
+        or add a second argument your password  
+        """
+        server.login("blog@gmail.com", "PASSWORD")
+
+        # from whom the message will be
+        # 1st argument, who is the message from, 2nd - to whom the letter will be sent, 3rd - message
+        server.sendmail(email, "blog@gmail.com", f"From:\n {name}\n {surname}\n {phone}\n Message: {message}")
+
+        return redirect('/contact')
+
+    return render_template('contact.html')
+
+
+@main_routes.route('/statistics')
+def statistics():
+    popular_posts = db.session.query(Posts).order_by(Posts.history_view.desc()).limit(6).all()
+    popular_comments = db.session.query(Comments).order_by(Comments.likes.desc()).limit(6).all()
+
+    return render_template('statistics_site.html', popular_posts=popular_posts, popular_comments=popular_comments)
 
 
 # Sign up

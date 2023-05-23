@@ -19,6 +19,8 @@ Using 'parametrize' will not constantly create a function, thereby shortening th
     ('/sign-up', 'Зарегеструватися'),
     ('/sign-in', 'Увійти'),
     ('/search/test', 'Результат по запиту "test"'),
+    ('/contact', 'Контакти'),
+    ('/statistics', 'Статистика сайту'),
 
     # profiles
     ('/my-profile', 'Мій профіль'),

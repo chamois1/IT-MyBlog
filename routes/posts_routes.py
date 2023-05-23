@@ -4,6 +4,8 @@ from flask_paginate import Pagination, get_page_args
 from models import Posts, Comments, Accounts_Users, ReplyComment, listRequestEdit
 from db import db
 
+from datetime import datetime
+
 # This file, for urls /post/resources, or /post/news other
 posts_bp = Blueprint('post', __name__)
 
@@ -21,7 +23,7 @@ def news_posts():
 
     pagination = Pagination(page=page, per_page=per_page, total=Posts.query.count(), css_framework='bootstrap4')
     
-    return render_template('news.html', posts=posts, pagination=pagination)
+    return render_template('news.html', posts=posts, pagination=pagination, now_date=datetime.now())
 
 
 @posts_bp.route('/post/<string:title>/<int:id>', methods=['POST', 'GET'])
