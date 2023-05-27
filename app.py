@@ -1,11 +1,11 @@
-""" Starting server, and settings server """
-
 from flask import Flask, session
 from flask_session import Session
 from flask_ckeditor import CKEditor
 from flask_migrate import Migrate
 
 from db import db_init, db
+from models import Accounts_Users
+from flask_bcrypt import Bcrypt
 
 # routes
 from routes.admin_panel import admin_bp
@@ -14,7 +14,6 @@ from routes.profile_users import profiles
 from routes.main_routes import main_routes
 
 def create_app(database_uri="sqlite:///blog.sqlite3"):
-
     # settings
     app = Flask(__name__)
     ckeditor = CKEditor(app)
@@ -34,7 +33,7 @@ def create_app(database_uri="sqlite:///blog.sqlite3"):
 
     db_init(app)
     Session(app)
-
+    
     """
     Added for convenience when working with models
     0. Create new column in models
@@ -57,6 +56,32 @@ def create_app(database_uri="sqlite:///blog.sqlite3"):
 
 
 app = create_app()
+
+"""
+Creating hard account for admin
+If you wish, you can delete or change the data
+"""
+
+with app.app_context():
+    
+    # Create hard account
+    def create_hardcoded_account_admin():
+
+        password = 'admin12345'.encode('utf-8')
+        bcrypt = Bcrypt()
+        data_admin = [
+            {'login': 'admin', 'email': 'admin@admin.com', 'password': bcrypt.generate_password_hash(password), 'is_admin': True},
+        ]
+        
+        for entry in data_admin:
+            if not Accounts_Users.query.filter_by(email=entry['email']).first():
+                admin = Accounts_Users(login=entry['login'], email=entry['email'], password=entry['password'], is_admin=entry['is_admin'])
+                db.session.add(admin)
+
+        db.session.commit()
+        db.session.close()
+
+    create_hardcoded_account_admin()
 
 
 if __name__ == '__main__':

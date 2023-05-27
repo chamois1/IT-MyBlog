@@ -18,13 +18,14 @@ main_routes = Blueprint('main_routes', __name__)
 # Main page
 @main_routes.route('/', methods=['POST', 'GET'])
 def index():
-
+    all_posts = db.session.query(Posts).all()
+ 
     # search field
     if request.method == 'POST':
         search = request.form['search']
         return redirect(f'/search/{search}')
 
-    return render_template('index.html')
+    return render_template('index.html', all_posts=all_posts)
 
 
 # result search 

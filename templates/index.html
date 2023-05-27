@@ -1,17 +1,30 @@
 {% extends 'base.html' %}
 
-{% block title %} Index {% endblock %}
-
-{% block link %}
-
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
-{% endblock %}
+{% block title %} Головна сторінка {% endblock %}
 
 {% block body %}
 
-<h1>Main page</h1>
-
+<div class="container mb-4">
+    <div class="row">
+        {% for post in all_posts %}
+            {% if post.date < now_date %}
+                <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 mt-4">
+                    <div class="card shadow">
+                        <div class="card-body text-center">
+                            <a href="/post/{{ post.title }}/{{ post.id }}">
+                                <img src="{{ post.image }}" class="card-img-top" alt="image post">
+                            </a>
+                            <ul class="list-inline mt-3">
+                                <li class="list-inline-item"><i class="far fa-clock"></i> {{ post.date }}</li>
+                            </ul>
+                            <hr>
+                            <p class="lead">{{ post.title }}</p>
+                            <a class="btn btn-outline-dark my-2" href="/post/{{ post.title }}/{{ post.id }}" role="button">Читати більше</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
