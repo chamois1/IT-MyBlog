@@ -13,7 +13,8 @@ from routes.posts_routes import posts_bp
 from routes.profile_users import profiles
 from routes.main_routes import main_routes
 
-def create_app(database_uri="sqlite:///blog.sqlite3"):
+
+def create_app(database_uri="postgresql://username:password@localhost:5432/blog"):
     # settings
     app = Flask(__name__)
     ckeditor = CKEditor(app)

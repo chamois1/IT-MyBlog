@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, request
 import os
 import uuid
+from datetime import datetime
 
-from flask import render_template, request, redirect, flash, session, current_app
-from flask_bcrypt import Bcrypt, check_password_hash
+from flask import render_template, request, redirect, flash, session, current_app, Blueprint
+from flask_bcrypt import Bcrypt, check_password_hash, bcrypt
 from flask_paginate import Pagination, get_page_args
 from sqlalchemy import or_ 
 import smtplib
@@ -25,7 +25,8 @@ def index():
         search = request.form['search']
         return redirect(f'/search/{search}')
 
-    return render_template('index.html', all_posts=all_posts)
+    now_date = datetime.now()
+    return render_template('index.html', all_posts=all_posts, now_date=now_date)
 
 
 # result search 
@@ -136,8 +137,9 @@ def sign_in():
        
        # form       
        email = request.form["email"]
-       password = request.form["password"].encode('utf-8') 
-    
+       password = request.form["password"]
+     
+
        search_account = db.session.query(Accounts_Users).filter_by(email=email).first()
        if not search_account:
             flash('Такого користувача не існує')
@@ -148,7 +150,8 @@ def sign_in():
            return redirect('/sign-in')
        
 
-       if check_password_hash(search_account.password, password):
+       password_hash = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+       if check_password_hash(password_hash.decode('utf'), password):
            # save session
            session['id'] = search_account.id
            session['is_admin'] = search_account.is_admin

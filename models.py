@@ -10,37 +10,37 @@ class Accounts_Users(db.Model):
        if admin - edit comments, create post, other
     """
 
-    __tablename__ = "accounts"   
+    __tablename__ = "accounts"
 
-    id = Column("id", Integer, primary_key=True, nullable=False)
-    login = Column('login', String(25), nullable=False)
-    email = Column("emai", String(25), nullable=False)
-    password = Column("password", String, nullable=False)
-    img_avatar = Column("avatar", String, nullable=True, default='/images/avatars/default_avatar.jpeg')
+    id = Column(Integer, primary_key=True, nullable=False)
+    login = Column(String(25), nullable=False)
+    email = Column(String(25), nullable=False)
+    password = Column(String(255), nullable=False)
+    img_avatar = Column(String(255), nullable=True, default='/images/avatars/default_avatar.jpeg')
 
-    latter_view = Column("history_view", JSON, default=[])
-    save_posts = Column("save_posts", JSON, default=[])
-    like_posts = Column("like_posts", JSON, default=[])
+    latter_view = Column(JSON, default=[])
+    save_posts = Column(JSON, default=[])
+    like_posts = Column(JSON, default=[])
 
     is_admin = Column(Boolean, default=False)
 
     is_block = Column(Boolean, default=False)
-    reason_block = Column('reason_block', String, nullable=True)
+    reason_block = Column(String, nullable=True)
 
 
 # Posts
 class Posts(db.Model):
     __tablename__ = "posts"   
 
-    id = Column("id", Integer, primary_key=True)
-    date = Column('date', DateTime)
-    title = Column('title', String)
-    description = Column("description", Text)
-    tag = Column("tag", String)
-    image = Column("image", String, nullable=True, default='/images/posts/default_post.jpeg')
-    type = Column('type', String)
+    id = Column(Integer, primary_key=True)
+    date = Column(DateTime)
+    title = Column(String)
+    description = Column(Text)
+    tag = Column(String)
+    image = Column(String, nullable=True, default='static/images/posts/default_post.jpeg')
+    type = Column(String)
 
-    history_view = Column('history_view', Integer, default=0)
+    history_view = Column(Integer, default=0)
 
     # connections of models
     comments = db.relationship('Comments', backref='post', lazy=True)
@@ -50,40 +50,40 @@ class Posts(db.Model):
 class Comments(db.Model):
     __tablename__ = "comments"
 
-    id = Column("id", Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     date = Column(DateTime, default=datetime.utcnow)
-    text = Column('text', Text)
-    id_post = Column('id_post', Integer, ForeignKey('posts.id'))
-    title_post = Column('title_post', String)
-    id_author = Column('id_author', Integer)
+    text = Column(Text)
+    id_post = Column(Integer, ForeignKey('posts.id'))
+    title_post = Column(String)
+    id_author = Column(Integer)
 
     # save the user id in the favorites list to check if he clicked
-    likes = Column('likes', JSON, default=[])
+    likes = Column(JSON, default=[])
 
 
 # Reply comment for main comment
 class ReplyComment(db.Model):
     __tablename__ = "reply_comment"
 
-    id = Column('id', Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     date = Column(DateTime, default=datetime.utcnow)
-    text = Column('text', Text)
-    id_main_comment = Column('id_main_comment', Integer)
+    text = Column(Text)
+    id_main_comment = Column(Integer)
 
-    id_author_reply = Column('id_author_reply', Integer)
-    login_author_reply = Column('login_author_reply', String)
-    avatar_author_reply = Column('avatar_author_reply', String)
+    id_author_reply = Column(Integer)
+    login_author_reply = Column(String)
+    avatar_author_reply = Column(String)
 
 
 # Edits to the post
 class listRequestEdit(db.Model):
     __tablename__ = "listRequestPost"
 
-    id = Column('id', Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     date = Column(DateTime, default=datetime.utcnow)
-    text = Column('text', Text)
+    text = Column(Text)
 
-    id_post = Column('id_post', Integer)
-    title_post = Column('title_post', String)
+    id_post = Column(Integer)
+    title_post = Column(String)
 
-    id_author = Column('id_author', Integer)
+    id_author = Column(Integer)

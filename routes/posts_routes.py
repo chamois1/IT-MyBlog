@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, request
 from flask_paginate import Pagination, get_page_args
+from sqlalchemy import cast, String
 
 from models import Posts, Comments, Accounts_Users, ReplyComment, listRequestEdit
 from db import db
@@ -35,8 +36,8 @@ def post(title, id):
 
     # info for post
     post = db.session.query(Posts).filter_by(id=id)
-    post_likes = db.session.query(Accounts_Users).filter(Accounts_Users.like_posts.like('%{}%'.format(id))).all()
-    post_saves = db.session.query(Accounts_Users).filter(Accounts_Users.save_posts.like('%{}%'.format(id))).all()
+    post_likes = db.session.query(Accounts_Users).filter(cast(Accounts_Users.like_posts, String).like('%{}%'.format(id))).all()
+    post_saves = db.session.query(Accounts_Users).filter(cast(Accounts_Users.save_posts, String).like('%{}%'.format(id))).all()
 
     comments_for_post = db.session.query(Comments).filter_by(id_post=id).all()
     replys_comments = db.session.query(ReplyComment).all()
